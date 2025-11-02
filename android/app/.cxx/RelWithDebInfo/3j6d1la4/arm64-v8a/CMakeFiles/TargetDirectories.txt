@@ -1,0 +1,2 @@
+/Users/apple/Documents/equalpixels/beprepared/android/app/.cxx/RelWithDebInfo/3j6d1la4/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/apple/Documents/equalpixels/beprepared/android/app/.cxx/RelWithDebInfo/3j6d1la4/arm64-v8a/CMakeFiles/rebuild_cache.dir

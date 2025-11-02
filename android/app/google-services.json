@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "701475782096",
+    "project_id": "beprepare-81678",
+    "storage_bucket": "beprepare-81678.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:701475782096:android:fc20e2dc03d54e02c2cdd5",
+        "android_client_info": {
+          "package_name": "com.brainstudioz.beprepared"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbS7R0B9onZvDexRsMs5yCvrhjQN5taqc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
