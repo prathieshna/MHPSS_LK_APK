@@ -29,13 +29,16 @@ class FavoritesNotifier extends StateNotifier<List<ResourceModel>> {
   Future<void> toggleFavorite(ResourceModel resource) async {
     final box = hive.box<ResourceModel>(favoritesBox);
 
-    if (state.any((item) => item.id == resource.id)) {
+    // Use slug as the key so same content across languages shares favorites
+    final key = resource.slug ?? resource.id ?? '';
+
+    if (state.any((item) => (item.slug ?? item.id) == key)) {
       // Remove favorite
-      await box.delete(resource.id);
-      state = state.where((item) => item.id != resource.id).toList();
+      await box.delete(key);
+      state = state.where((item) => (item.slug ?? item.id) != key).toList();
     } else {
-      // Add favorite
-      await box.put(resource.id, resource..isFavorite = true);
+      // Add favorite using slug as key
+      await box.put(key, resource..isFavorite = true);
       // Prepend the new favorite to the top of the list
       state = [resource] + state;
     }

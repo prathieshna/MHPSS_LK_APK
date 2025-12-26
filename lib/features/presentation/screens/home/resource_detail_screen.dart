@@ -62,9 +62,6 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final favorites = ref.watch(favoritesProvider);
-    final isFavorite = favorites.any((item) => item.id == widget.id);
-
     return Scaffold(
       appBar: const CustomAppBar(),
       body: RefreshIndicator(
@@ -81,6 +78,13 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                     if (singleResourceData.resource == null) {
                       return Center(child: Text("no_resources".tr()));
                     }
+
+                    // Check if favorited using slug
+                    final favorites = ref.watch(favoritesProvider);
+                    final isFavorite = favorites.any((item) =>
+                        (item.slug ?? item.id) ==
+                        (singleResourceData.resource?.slug ??
+                            singleResourceData.resource?.id));
 
                     // Separate resource documents
                     final ResourceDocumentGroups documentGroups =
@@ -200,6 +204,9 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                               ResourceModel(
                                                 id: singleResourceData
                                                         .resource?.id ??
+                                                    "",
+                                                slug: singleResourceData
+                                                        .resource?.slug ??
                                                     "",
                                                 title: singleResourceData
                                                         .resource?.title ??
@@ -490,9 +497,10 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
 
                                         final favorites =
                                             ref.watch(favoritesProvider);
-                                        final isFavorite = favorites.any(
-                                            (item) =>
-                                                item.id == resourceData.id);
+                                        final isFavorite = favorites.any((item) =>
+                                            (item.slug ?? item.id) ==
+                                            (resourceData.slug ??
+                                                resourceData.id));
                                         final isPdfDoc = resourceData
                                                 .resourceDocument
                                                 .any((doc) =>

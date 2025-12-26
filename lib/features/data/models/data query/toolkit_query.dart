@@ -2,16 +2,14 @@ class ToolkitQuery {
   static String toolkitCategoryQuery(String locale) {
     return """
       query {
-        toolkit(locales: $locale, where: { slug: "mhpsslk-app" }) {
+        toolkit(where: { slug: "mhpsslk-app" }) {
                 version
-                toolkitCategories {
+                toolkitCategories(where: { language: $locale }) {
                     id
                     title
                     slug
                     image {
-                        caption
                         id
-                        locale
                         url
                     }
                 }
@@ -23,8 +21,8 @@ class ToolkitQuery {
   static String toolkitSubCategoryQuery(String locale) {
     return """
       query MyQuery @cached {
-        toolkit(locales: $locale, where: { slug: "mhpsslk-app" }) {
-          toolkitCategories(where: { id: "cm4i632gzx8vh07uob77cxy3w" }) {
+        toolkit(where: { slug: "mhpsslk-app" }) {
+          toolkitCategories(where: { id: "cm4i632gzx8vh07uob77cxy3w", language: $locale }) {
             id
             title
             slug
@@ -34,7 +32,7 @@ class ToolkitQuery {
               locale
               url
             }
-            toolkitSubCategories {
+            toolkitSubCategories(where: { language: $locale }) {
               id
               slug
               title
@@ -52,9 +50,9 @@ class ToolkitQuery {
   static String resourcesByCategoryQuery(String id, String locale) {
     return """
         query Toolkit {
-            toolkit(locales: $locale, where: { slug: "mhpsslk-app" }) {
-                toolkitCategories(where: { id: "$id" }) {
-                    resource {
+            toolkit(where: { slug: "mhpsslk-app" }) {
+                toolkitCategories(where: { id: "$id", language: $locale }) {
+                    resource(where: { language: $locale }) {
                         id
                         image {
                             url
@@ -72,20 +70,21 @@ class ToolkitQuery {
                                 language
                             }
                             fileFormat
-                        } 
-                    } 
+                        }
+                    }
                 }
             }
         }
     """;
   }
 
-  static String homePageVideoQuery() {
+  static String homePageVideoQuery(String locale) {
     return """
       query MyQuery {
-        videos(last: 1) {
+        videos(where: { language: $locale }, last: 1) {
           title
           videoUrl
+          language
         }
       }
     """;

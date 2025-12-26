@@ -195,27 +195,30 @@ class _CustomAppBarState extends ConsumerState<CustomAppBar> {
                         if (widget.isFliter == true)
                           Row(
                             children: [
-                              SizedBox(width: 16.w),
+                              SizedBox(width: 8.w),
                               GestureDetector(
                                 onTap: widget.onFliter ?? () {},
                                 child: SvgPicture.asset(
                                   AppImages.filterIcon,
                                 ),
                               ),
+                              // ADDED: Spacing to balance filter icon since notification icon is hidden
+                              SizedBox(width: 4.w),
                             ],
                           ),
-                        SizedBox(width: 16.w),
-                        // Notification Icon with Badge
-                        GestureDetector(
-                          onTap: widget.onNotification ??
-                              () {
-                                navigator.navigateToWithBottomNavBar(
-                                    context, const NotificationsScreen());
-                              },
-                          child: SvgPicture.asset(
-                            AppImages.notificationsIcon,
-                          ),
-                        ),
+                        // COMMENTED OUT: Notification Icon
+                        // SizedBox(width: 16.w),
+                        // // Notification Icon with Badge
+                        // GestureDetector(
+                        //   onTap: widget.onNotification ??
+                        //       () {
+                        //         navigator.navigateToWithBottomNavBar(
+                        //             context, const NotificationsScreen());
+                        //       },
+                        //   child: SvgPicture.asset(
+                        //     AppImages.notificationsIcon,
+                        //   ),
+                        // ),
                         // Settings Icon
                         // if (widget.isFliter == false)
                         //   Row(

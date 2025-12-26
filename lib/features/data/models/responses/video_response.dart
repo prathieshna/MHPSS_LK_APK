@@ -38,18 +38,21 @@ class VideoData {
 class Video {
   final String title;
   final String videoUrl;
+  final String? language;
 
-  Video({required this.title, required this.videoUrl});
+  Video({required this.title, required this.videoUrl, this.language});
 
   factory Video.fromJson(Map<String, dynamic> json) {
     return Video(
       title: json['title'],
       videoUrl: json['videoUrl'],
+      language: json['language'],
     );
   }
 
   Map<String, dynamic> toJson() => {
         'title': title,
         'videoUrl': videoUrl,
+        'language': language,
       };
 }

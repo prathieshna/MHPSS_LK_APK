@@ -9,29 +9,39 @@ class ResourcesRepository extends ResourcesRepositoryInterface {
   final ResourcesQuery resourcesQuery = ResourcesQuery();
   final String baseUrl = APIConstants.baseUrl;
 
-  // Map app locale codes to Hygraph supported locales with fallback
+  // Map app locale codes to language codes for Hygraph
   String _getHygraphLocale(String appLocaleCode) {
-    switch (appLocaleCode) {
+    // Extract just the language code (e.g., 'en' from 'en_US', 'ta' from 'ta_LK')
+    final languageCode = appLocaleCode.split('_').first;
+
+    switch (languageCode) {
       case 'en':
         return 'en';
       case 'ar':
         return 'ar';
       case 'si':
+        return 'si';
       case 'ta':
-        // Fallback to English for Sinhala and Tamil since Hygraph likely doesn't support them
-        return 'en';
+        return 'ta';
       default:
         return 'en'; // Default fallback to English
     }
   }
 
   Future<PopularResourcesResponse> getPopularResourcesRepository() async {
+    print("🟡 [DEBUG] ResourcesRepository.getPopularResourcesRepository: Called");
     try {
+      final locale = navigatorKey.currentContext!.locale.languageCode;
+      final hygraphLocale = _getHygraphLocale(locale);
+      print("🟡 [DEBUG] App locale: $locale, Hygraph locale: $hygraphLocale");
+
+      final query = ResourcesQuery.getPopularResourcesQuery(hygraphLocale);
+      print("🟡 [DEBUG] Full Query:\n$query");
+
       final response = await post(
-        "${baseUrl}v1/graphql",
+        baseUrl,
         data: {
-          "query": ResourcesQuery.getPopularResourcesQuery(
-              _getHygraphLocale(navigatorKey.currentContext!.locale.languageCode)),
+          "query": query,
         },
       );
 
@@ -54,7 +64,7 @@ class ResourcesRepository extends ResourcesRepositoryInterface {
     print("Repo id: $id");
     try {
       final response = await post(
-        "${baseUrl}v1/graphql",
+        baseUrl,
         data: {
           "query": ResourcesQuery.getSingleResourceQuery(
               id, _getHygraphLocale(navigatorKey.currentContext!.locale.languageCode)),
@@ -79,16 +89,24 @@ class ResourcesRepository extends ResourcesRepositoryInterface {
 
   Future<SearchResponse> getAllSearchResourcesRepository(
       String? searchQuery) async {
+    print("🔍 [DEBUG] Search query: $searchQuery");
     try {
-      final response = await get(
-        "https://www.mhpss.net/api/search?facet=toolkit.title:BePrepared+App&q=$searchQuery",
+      final response = await post(
+        baseUrl,
+        data: {
+          "query": ResourcesQuery.searchResourcesQuery(
+              searchQuery ?? "",
+              _getHygraphLocale(navigatorKey.currentContext!.locale.languageCode)),
+        },
       );
 
       log("search response: ${response.data}");
       log("search status code: ${response.statusCode}");
 
       if (response.statusCode == 200 && response.data != null) {
-        return SearchResponse.fromJson(response.data);
+        // Convert Hygraph response to SearchResponse format
+        // The response.data["data"]["resources"] contains the search results
+        return SearchResponse.fromHygraphJson(response.data);
       } else {
         throw Exception(
             'Failed to load search data: ${response.statusMessage}');

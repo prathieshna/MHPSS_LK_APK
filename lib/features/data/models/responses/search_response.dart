@@ -51,6 +51,53 @@ class SearchResponse {
         serverTimeMS: json['serverTimeMS'],
       );
 
+  // Convert Hygraph GraphQL response to SearchResponse format
+  factory SearchResponse.fromHygraphJson(Map<String, dynamic> json) {
+    final resources = json['data']?['resources'] as List?;
+    final hits = resources?.map((resource) {
+      return Hit(
+        author: resource['author'],
+        description: resource['descriptionDeprecated'],
+        publishingDate: resource['publishingDate'],
+        slug: resource['slug'],
+        title: resource['title'],
+        objectID: resource['id'],
+        tags: resource['tags'],
+        imageHit: resource['image'] != null
+            ? ImageHit(
+                id: resource['image']['id'],
+                url: resource['image']['url'],
+              )
+            : null,
+        categories: resource['toolkitCategories'] != null
+            ? List<Category>.from(
+                (resource['toolkitCategories'] as List).map(
+                  (cat) => Category(
+                    id: cat['id'],
+                    title: cat['title'],
+                  ),
+                ),
+              )
+            : null,
+        type: resource['resourceDocument'] != null
+            ? List<String>.from(
+                (resource['resourceDocument'] as List).map(
+                  (doc) => doc['fileFormat'] ?? '',
+                ),
+              )
+            : null,
+      );
+    }).toList();
+
+    return SearchResponse(
+      hits: hits,
+      nbHits: hits?.length ?? 0,
+      page: 0,
+      nbPages: 1,
+      hitsPerPage: hits?.length ?? 0,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
         'hits': hits?.map((x) => x.toJson()).toList(),
         'nbHits': nbHits,

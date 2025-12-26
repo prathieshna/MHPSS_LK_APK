@@ -2,12 +2,12 @@ class ResourcesQuery {
   static String getPopularResourcesQuery(String locale) {
     return """
       query Toolkit {
-          toolkit(locales: $locale, where: { slug: "mhpsslk-app" }) {
+          toolkit(where: { slug: "mhpsslk-app" }) {
             description
             hostMessage
             id
             title
-            resources {
+            resources(where: { language: $locale }) {
               id
               image { url }
               title
@@ -38,11 +38,53 @@ class ResourcesQuery {
     """;
   }
 
+  static String searchResourcesQuery(String searchQuery, String locale) {
+    return """
+      query SearchResources {
+        resources(
+          where: {
+            language: $locale
+            OR: [
+              { title_contains: "$searchQuery" }
+              { author_contains: "$searchQuery" }
+              { descriptionDeprecated_contains: "$searchQuery" }
+              { tags_contains_some: ["$searchQuery"] }
+            ]
+          }
+          first: 50
+        ) {
+          id
+          title
+          slug
+          author
+          descriptionDeprecated
+          publishingDate
+          publishedAt
+          createdAt
+          popular
+          tags
+          image {
+            id
+            url
+          }
+          resourceDocument {
+            id
+            fileFormat
+          }
+          toolkitCategories {
+            id
+            title
+          }
+        }
+      }
+    """;
+  }
+
   static String getSingleResourceQuery(String? id, String locale) {
     print("qurey id: $id");
     return """
       query {
-             resource(where: { id: "$id" }, locales: $locale) {
+             resource(where: { id: "$id" }) {
             accessToMaterials
             author
             dataType
@@ -61,7 +103,7 @@ class ResourcesQuery {
                 id
                 link
                 title
-                resourceTranslations(locales: $locale) {
+                resourceTranslations(where: { language: $locale }) {
                     createdAt
                     id
                     language
@@ -78,7 +120,7 @@ class ResourcesQuery {
                 url
             }
             toolkitCategories {
-            id 
+            id
            }
         }
       }

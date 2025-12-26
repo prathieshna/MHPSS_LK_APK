@@ -20,7 +20,7 @@ const String graphqlQuery = """
       """;
 
 final HttpLink httpLink = HttpLink(
-    "https://ap-south-1.cdn.hygraph.com/content/cm4j9qqks07va07tf6j8msb0g/master");
+    "https://ap-south-1.cdn.hygraph.com/content/cmj15y3p8012p07v0ba06afxr/master");
 
 final ValueNotifier<GraphQLClient> client = ValueNotifier<GraphQLClient>(
   GraphQLClient(

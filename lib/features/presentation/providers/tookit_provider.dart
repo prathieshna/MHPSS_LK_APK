@@ -10,8 +10,18 @@ final _apiServiceProvider = Provider<ToolkitRespository>((ref) {
 
 final toolkitCategoryProvider = FutureProvider.autoDispose<ToolkitResponse>(
   (ref) async {
-    final apiService = ref.watch(_apiServiceProvider);
-    return apiService.getToolkitCategoryRepository();
+    print("🔵 [DEBUG] toolkitCategoryProvider: Started");
+    try {
+      final apiService = ref.watch(_apiServiceProvider);
+      print("🔵 [DEBUG] toolkitCategoryProvider: API service obtained");
+      final result = await apiService.getToolkitCategoryRepository();
+      print("🔵 [DEBUG] toolkitCategoryProvider: Success - got ${result.toolkit?.toolkitAllCategories?.length ?? 0} categories");
+      return result;
+    } catch (e, stack) {
+      print("🔴 [DEBUG] toolkitCategoryProvider: ERROR - $e");
+      print("🔴 [DEBUG] Stack trace: $stack");
+      rethrow;
+    }
   },
 );
 

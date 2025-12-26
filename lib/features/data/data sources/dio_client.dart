@@ -5,13 +5,12 @@ class DioClient {
 
   DioClient() {
     dio = Dio();
-    dio.options.baseUrl = ""; //APIConstants.baseUrl;
+    dio.options.baseUrl = APIConstants.baseUrl;
     dio.options.connectTimeout = const Duration(milliseconds: 50000);
     dio.options.receiveTimeout = const Duration(milliseconds: 60000);
     dio.options.headers = {
       'content-type': 'application/json',
-      'x-hasura-admin-secret':
-          't0GEA0YSQ1b4glWb34yQX1bUtKeVbzK8VEe9OJHHGfBMQKiXyeQHYij3RfMWODdB'
+      'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImdjbXMtbWFpbi1wcm9kdWN0aW9uIn0.eyJ2ZXJzaW9uIjozLCJpYXQiOjE3NjY3NjQ5NzcsImF1ZCI6WyJodHRwczovL2FwaS1hcC1zb3V0aC0xLmh5Z3JhcGguY29tL3YyL2NtajE1eTNwODAxMnAwN3YwYmEwNmFmeHIvbWFzdGVyIiwibWFuYWdlbWVudC1uZXh0LmdyYXBoY21zLmNvbSJdLCJpc3MiOiJodHRwczovL21hbmFnZW1lbnQtYXAtc291dGgtMS5oeWdyYXBoLmNvbS8iLCJzdWIiOiI1ZGM2NWI0ZC1jNzI5LTQ2MmEtOWVmMS1hNTZmNDAzMDY3MjEiLCJqdGkiOiJjbWpuMjkxaHYxaXlrMDhwYjIzZ2RianZkIn0.adLEblLphORRx3YucwfLcp5TEpumGrm3rQKyxtL7Vi0xjU64mx0J2y9i5SP3eQIix0YlgMxcFL4SgVwMQZUvFa2AUb_ISaOycQFfpMqe47cr9F91ZDoKyTvZx6l6WTfmGxZvyjATbHDq73O3ju0zGE7m7QtFKTNyU7XkpHzSE0ERTwN-bN8Ahdj9m3xyjpuE4_QUKKgUpc8AhFtMKXgprJ_GHcqQBX5Y3eSBucm-Mn-6Z13Ap9zhV2KvRxgAmzzMQRnkyHcZyCUmpoxMg8xXmuMcGN0AsQWrQrdKjPiD4oowcPVezUWK7U8r02ZXMuyCIv_l75ivm-eOpXnPD2YBBI2k_M4v3ARPL4S5o7T5NmqXzr_Cbrb62IRNkMQ9NOizwyqDeOBqi4ILpOmFTeRLwHVIv_zz6rH3DF2E5_fiOai3r8SSlxGwgVJ_X-U-p02YBr20wSE0v8V1KECrdjIHFnlEyLvGktWi8akp_Aw5s1jkZ4934-PeZZ6oBw5c9RvJDcg3w5o-n4Vztv_eM_oNxNl7Ry_wHIGF24ndj_67Dg6ZTwzUydV62iZDvfWO0JNm5PGUeG2KmySkeq5I53kGIyZIlJRnMXluw6xTscqOPMLRkG47Pu0shOSvzrGYGs9WGpeApw5QX1wT8bDyovltnpEuAZbdTFFDlHUZiwFoG9A'
     };
 
     // Add interceptors
@@ -155,11 +154,17 @@ class DioClient {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
+    print("🌐 [DIO] POST Request Starting...");
+    print("🌐 [DIO] Path: $path");
+    print("🌐 [DIO] Data: ${data.toString().substring(0, data.toString().length > 200 ? 200 : data.toString().length)}...");
+
     log("Dio: post path: $path");
     log("Dio: post queryParameters: $queryParameters");
     log("Dio: post options: $options");
     log("Dio: post data: $data");
+
     try {
+      print("🌐 [DIO] Sending request...");
       final response = await dio.post<T>(
         path,
         data: data,
@@ -169,8 +174,17 @@ class DioClient {
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
       );
+      print("🌐 [DIO] Response received - Status: ${response.statusCode}");
       return response;
     } on DioException catch (dioError) {
+      print("❌ [DIO] DioException caught!");
+      print("❌ [DIO] Type: ${dioError.type}");
+      print("❌ [DIO] Message: ${dioError.message}");
+      print("❌ [DIO] Error: ${dioError.error}");
+      print("❌ [DIO] Status Code: ${dioError.response?.statusCode}");
+      print("❌ [DIO] Response Data: ${dioError.response?.data}");
+      print("❌ [DIO] Response Headers: ${dioError.response?.headers}");
+
       log("DioError: post path: $path");
       log("DioError: post queryParameters: $queryParameters");
       log("DioError: post data: $data");
@@ -178,8 +192,15 @@ class DioClient {
       log("DioError: post dioError.error: ${dioError.error}");
       log("DioError: post dioError.message: ${dioError.message}");
       log("DioError: post dioError.response: ${dioError.response}");
+
       final errorHandler = ErrorHandler.handle(dioError);
+      print("❌ [DIO] Error Handler Message: ${errorHandler.failure.message}");
       throw Exception(errorHandler.failure.message);
+    } catch (e, stack) {
+      print("❌ [DIO] Unknown Exception caught!");
+      print("❌ [DIO] Exception: $e");
+      print("❌ [DIO] Stack: $stack");
+      rethrow;
     }
   }
 

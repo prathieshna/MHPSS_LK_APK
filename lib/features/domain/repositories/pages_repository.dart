@@ -10,17 +10,20 @@ class PagesRepository extends PagesRepositoryInterface {
   final ResourcesQuery resourcesQuery = ResourcesQuery();
   final String baseUrl = APIConstants.baseUrl;
 
-  // Map app locale codes to Hygraph supported locales with fallback
+  // Map app locale codes to language codes for Hygraph
   String _getHygraphLocale(String appLocaleCode) {
-    switch (appLocaleCode) {
+    // Extract just the language code (e.g., 'en' from 'en_US', 'ta' from 'ta_LK')
+    final languageCode = appLocaleCode.split('_').first;
+
+    switch (languageCode) {
       case 'en':
         return 'en';
       case 'ar':
         return 'ar';
       case 'si':
+        return 'si';
       case 'ta':
-        // Fallback to English for Sinhala and Tamil since Hygraph likely doesn't support them
-        return 'en';
+        return 'ta';
       default:
         return 'en'; // Default fallback to English
     }
@@ -28,13 +31,10 @@ class PagesRepository extends PagesRepositoryInterface {
   Future<PagesResponse> getPagesRepository() async {
     try {
       final response = await post(
-        "${baseUrl}v1/graphql",
+        baseUrl,
         data: {
           "query": PagesQuery.pagesQuery(
               _getHygraphLocale(navigatorKey.currentContext!.locale.languageCode)),
-          'variables': {
-            'locales': [_getHygraphLocale(navigatorKey.currentContext!.locale.languageCode)]
-          },
         },
       );
 
@@ -55,7 +55,7 @@ class PagesRepository extends PagesRepositoryInterface {
   Future<OnboardingResponse> getOnboardingRepository() async {
     try {
       final response = await post(
-        "${baseUrl}v1/graphql",
+        baseUrl,
         data: {
           "query": PagesQuery.onboardingQuery(
               _getHygraphLocale(navigatorKey.currentContext!.locale.languageCode)),

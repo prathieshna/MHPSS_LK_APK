@@ -158,8 +158,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               resourceListData.elementAt(index);
 
                           final favorites = ref.watch(favoritesProvider);
-                          final isFavorite = favorites
-                              .any((item) => item.id == resourceData.id);
+                          final isFavorite = favorites.any((item) =>
+                              (item.slug ?? item.id) ==
+                              (resourceData.slug ?? resourceData.id));
                           final isPdfDoc = resourceData.resourceDocument?.any(
                                   (doc) =>
                                       doc.fileFormat?.toLowerCase() == 'pdf') ??
@@ -223,6 +224,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     .toggleFavorite(
                                       ResourceModel(
                                         id: resourceData.id ?? "",
+                                        slug: resourceData.slug ?? "",
                                         title: resourceData.title ?? "N/A",
                                         description: resourceData
                                                 .descriptionDeprecated ??

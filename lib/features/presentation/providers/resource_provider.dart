@@ -20,8 +20,18 @@ final singleResourcesDataProvider =
 final popularResourcesProvider =
     FutureProvider.autoDispose<PopularResourcesResponse>(
   (ref) async {
-    final apiService = ref.watch(_apiServiceProvider);
-    return apiService.getPopularResourcesRepository();
+    print("🟢 [DEBUG] popularResourcesProvider: Started");
+    try {
+      final apiService = ref.watch(_apiServiceProvider);
+      print("🟢 [DEBUG] popularResourcesProvider: API service obtained");
+      final result = await apiService.getPopularResourcesRepository();
+      print("🟢 [DEBUG] popularResourcesProvider: Success - got ${result.data?.toolkit?.resources?.length ?? 0} resources");
+      return result;
+    } catch (e, stack) {
+      print("🔴 [DEBUG] popularResourcesProvider: ERROR - $e");
+      print("🔴 [DEBUG] Stack trace: $stack");
+      rethrow;
+    }
   },
 );
 

@@ -1,12 +1,13 @@
 class PagesQuery {
   static String pagesQuery(String locale) {
     return '''
-      query MyQuery(\$locales: [Locale!] = $locale) {
-        pagesConnection(locales: \$locales, last: 10, stage: PUBLISHED) {
+      query MyQuery {
+        pagesConnection(where: { language: $locale }, last: 10, stage: PUBLISHED) {
           edges {
             node {
               title
               summary
+              language
               content {
                 html
               }
@@ -20,7 +21,7 @@ class PagesQuery {
   static String onboardingQuery(String locale) {
     return '''
           query onboardingScreens {
-                onboardingScreens(where: { language: "$locale" }) {
+                onboardingScreens(where: { language: $locale }) {
                   title
                   language
                   description

@@ -43,6 +43,9 @@ class ResourceModel {
   @HiveField(12)
   final bool? videoDocumeent;
 
+  @HiveField(13)
+  final String? slug;
+
   ResourceModel(
       {this.id,
       this.title,
@@ -56,7 +59,8 @@ class ResourceModel {
       this.toolkitCategories,
       this.pdfDocument,
       this.audioDocument,
-      this.videoDocumeent});
+      this.videoDocumeent,
+      this.slug});
 }
 
 // flutter packages pub run build_runner build  --delete-conflicting-outputs

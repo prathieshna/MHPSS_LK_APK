@@ -21,6 +21,7 @@ class OnboardingPage extends StatelessWidget {
           SizedBox(height: 44.h),
           Text(
             item.title ?? "",
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.textBlueColor,
               fontSize: 28.sp,
@@ -38,14 +39,9 @@ class OnboardingPage extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10.h),
-          SizedBox(
-            height: 547.h,
+          Expanded(
             child: NetworkImageWidget(imageURL: item.image?.url),
           ),
-          // Image.asset(
-          //   item.imagePath,
-          //   scale: 2.1,
-          // )
         ],
       ),
     );

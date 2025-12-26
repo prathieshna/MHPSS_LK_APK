@@ -41,6 +41,7 @@ export 'package:beprepared/features/domain/repositories/toolkit_respository.dart
 export 'package:beprepared/features/presentation/notifiers/bottom_nav_provider.dart';
 export 'package:beprepared/features/presentation/notifiers/onboarding_provider.dart';
 export 'package:beprepared/features/presentation/notifiers/splash_provider.dart';
+export 'package:beprepared/features/presentation/providers/pages_provider.dart';
 export 'package:beprepared/features/presentation/providers/resource_provider.dart';
 export 'package:beprepared/features/presentation/providers/tookit_provider.dart';
 export 'package:beprepared/features/presentation/screens/ai_assitant_screen.dart';

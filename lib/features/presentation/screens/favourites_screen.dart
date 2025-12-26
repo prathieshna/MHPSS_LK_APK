@@ -24,10 +24,11 @@ class _FavouritesScreenState extends ConsumerState<FavouritesScreen> {
         isFliter: true,
         isFavoriteSearch: true,
         controller: searchConroller,
-        isBack: true,
-        onBack: () {
-          ref.read(bottomNavProvider.notifier).setIndex(0);
-        },
+        // COMMENTED OUT: Back button (unnecessary - already have bottom nav)
+        // isBack: true,
+        // onBack: () {
+        //   ref.read(bottomNavProvider.notifier).setIndex(0);
+        // },
         onFliter: () {
           ref.read(favoritesProvider.notifier).updateSearchTerm("");
           searchConroller.clear();

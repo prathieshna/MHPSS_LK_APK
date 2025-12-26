@@ -48,8 +48,9 @@ class _AllResourcesScreenState extends ConsumerState<AllResourcesScreen> {
                               final resourceData = resources.data.toolkit
                                   .toolkitCategories.first.resources[index];
                               final favorites = ref.watch(favoritesProvider);
-                              final isFavorite = favorites
-                                  .any((item) => item.id == resourceData.id);
+                              final isFavorite = favorites.any((item) =>
+                                  (item.slug ?? item.id) ==
+                                  (resourceData.slug ?? resourceData.id));
                               final isPdfDoc = resourceData.resourceDocument
                                       .any((doc) =>
                                           doc.fileFormat?.toLowerCase() ==
@@ -188,8 +189,9 @@ class _AllResourcesScreenState extends ConsumerState<AllResourcesScreen> {
                                   resources.data!.toolkit!.resources![index];
 
                               final favorites = ref.watch(favoritesProvider);
-                              final isFavorite = favorites
-                                  .any((item) => item.id == resourceData.id);
+                              final isFavorite = favorites.any((item) =>
+                                  (item.slug ?? item.id) ==
+                                  (resourceData.slug ?? resourceData.id));
                               final isPdfDoc = resourceData.resourceDocument
                                       ?.any((doc) =>
                                           doc.fileFormat?.toLowerCase() ==

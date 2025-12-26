@@ -62,7 +62,9 @@ class _SearchDropdownState extends ConsumerState<SearchDropdown> {
 
     return DropdownMenu<Hit>(
       controller: _menuController,
-      width: MediaQuery.of(context).size.width * 0.85,
+      // UPDATED: Removed fixed width to allow full width from Expanded parent
+      // Old value: width: MediaQuery.of(context).size.width * 0.85,
+      width: double.infinity, // Full width within available space
       hintText: "search".tr(),
       requestFocusOnTap: true,
       enableFilter: false,

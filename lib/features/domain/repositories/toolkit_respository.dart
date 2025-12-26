@@ -9,29 +9,39 @@ abstract class ToolkitRespositoryInterface extends DioClient {}
 class ToolkitRespository extends ToolkitRespositoryInterface {
   final String baseUrl = APIConstants.baseUrl;
 
-  // Map app locale codes to Hygraph supported locales with fallback
+  // Map app locale codes to language codes for Hygraph
   String _getHygraphLocale(String appLocaleCode) {
-    switch (appLocaleCode) {
+    // Extract just the language code (e.g., 'en' from 'en_US', 'ta' from 'ta_LK')
+    final languageCode = appLocaleCode.split('_').first;
+
+    switch (languageCode) {
       case 'en':
         return 'en';
       case 'ar':
         return 'ar';
       case 'si':
+        return 'si';
       case 'ta':
-        // Fallback to English for Sinhala and Tamil since Hygraph likely doesn't support them
-        return 'en';
+        return 'ta';
       default:
         return 'en'; // Default fallback to English
     }
   }
 
   Future<ToolkitResponse> getToolkitCategoryRepository() async {
+    print("🟡 [DEBUG] ToolkitRepository.getToolkitCategoryRepository: Called");
     try {
+      final locale = navigatorKey.currentContext!.locale.languageCode;
+      final hygraphLocale = _getHygraphLocale(locale);
+      print("🟡 [DEBUG] App locale: $locale, Hygraph locale: $hygraphLocale");
+
+      final query = ToolkitQuery.toolkitCategoryQuery(hygraphLocale);
+      print("🟡 [DEBUG] Full Query:\n$query");
+
       final response = await post(
-        "${baseUrl}v1/graphql",
+        baseUrl,
         data: {
-          "query": ToolkitQuery.toolkitCategoryQuery(
-              _getHygraphLocale(navigatorKey.currentContext!.locale.languageCode)),
+          "query": query,
         },
       );
 
@@ -53,7 +63,7 @@ class ToolkitRespository extends ToolkitRespositoryInterface {
   Future<ToolkitSubCategoryResponse> getToolkitSubCategoryRepository() async {
     try {
       final response = await post(
-        "${baseUrl}v1/graphql",
+        baseUrl,
         data: {
           "query": ToolkitQuery.toolkitSubCategoryQuery(
               _getHygraphLocale(navigatorKey.currentContext!.locale.languageCode)),
@@ -79,7 +89,7 @@ class ToolkitRespository extends ToolkitRespositoryInterface {
       String id) async {
     try {
       final response = await post(
-        "${baseUrl}v1/graphql",
+        baseUrl,
         data: {
           "query": ToolkitQuery.resourcesByCategoryQuery(
               id, _getHygraphLocale(navigatorKey.currentContext!.locale.languageCode)),
@@ -105,9 +115,10 @@ class ToolkitRespository extends ToolkitRespositoryInterface {
   Future<VideoResponse> homePageVideoRepository() async {
     try {
       final response = await post(
-        "${baseUrl}v1/graphql",
+        baseUrl,
         data: {
-          "query": ToolkitQuery.homePageVideoQuery(),
+          "query": ToolkitQuery.homePageVideoQuery(
+              _getHygraphLocale(navigatorKey.currentContext!.locale.languageCode)),
         },
       );
 

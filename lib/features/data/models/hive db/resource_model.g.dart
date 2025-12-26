@@ -30,13 +30,14 @@ class ResourceModelAdapter extends TypeAdapter<ResourceModel> {
       pdfDocument: fields[10] as bool?,
       audioDocument: fields[11] as bool?,
       videoDocumeent: fields[12] as bool?,
+      slug: fields[13] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ResourceModel obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -62,7 +63,9 @@ class ResourceModelAdapter extends TypeAdapter<ResourceModel> {
       ..writeByte(11)
       ..write(obj.audioDocument)
       ..writeByte(12)
-      ..write(obj.videoDocumeent);
+      ..write(obj.videoDocumeent)
+      ..writeByte(13)
+      ..write(obj.slug);
   }
 
   @override
