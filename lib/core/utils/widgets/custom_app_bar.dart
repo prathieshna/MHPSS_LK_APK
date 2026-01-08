@@ -1,5 +1,5 @@
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/features/presentation/screens/settings/notifications.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/features/presentation/screens/settings/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart' as painting;
 

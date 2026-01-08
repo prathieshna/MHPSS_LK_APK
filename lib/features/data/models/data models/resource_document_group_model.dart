@@ -1,4 +1,4 @@
-import 'package:beprepared/features/data/models/responses/single_resource_response.dart';
+import 'package:mhpss_app/features/data/models/responses/single_resource_response.dart';
 
 class ResourceDocumentGroups {
   final SingleResourceDocument? pdfDocument;

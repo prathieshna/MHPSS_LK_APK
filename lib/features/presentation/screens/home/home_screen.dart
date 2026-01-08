@@ -1,5 +1,5 @@
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/features/presentation/providers/debouncing_provider.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/features/presentation/providers/debouncing_provider.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {

@@ -1,8 +1,8 @@
-import 'package:beprepared/beprepared.dart';
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/features/data/models/data%20query/pages_query.dart';
-import 'package:beprepared/features/data/models/responses/onboarding_response.dart';
-import 'package:beprepared/features/data/models/responses/pages_response.dart';
+import 'package:mhpss_app/mhpss_app.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/features/data/models/data%20query/pages_query.dart';
+import 'package:mhpss_app/features/data/models/responses/onboarding_response.dart';
+import 'package:mhpss_app/features/data/models/responses/pages_response.dart';
 
 abstract class PagesRepositoryInterface extends DioClient {}
 

@@ -1,5 +1,5 @@
-import 'package:beprepared/beprepared.dart';
-import 'package:beprepared/core/resources/all_imports.dart';
+import 'package:mhpss_app/mhpss_app.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
 import 'package:flutter/material.dart';
 
 class AppButton extends StatefulWidget {

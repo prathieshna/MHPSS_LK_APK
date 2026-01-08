@@ -1,4 +1,4 @@
-import 'package:beprepared/features/data/models/responses/toolkit_categories_response.dart';
+import 'package:mhpss_app/features/data/models/responses/toolkit_categories_response.dart';
 
 class ToolkitSubCategoryResponse {
   final ToolkitData? data;

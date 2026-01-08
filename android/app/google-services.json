@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "701475782096",
-    "project_id": "beprepare-81678",
-    "storage_bucket": "beprepare-81678.firebasestorage.app"
+    "project_number": "451445561764",
+    "project_id": "mhpss-lk",
+    "storage_bucket": "mhpss-lk.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:701475782096:android:fc20e2dc03d54e02c2cdd5",
+        "mobilesdk_app_id": "1:451445561764:android:a084c12d7f9aaecf9d8931",
         "android_client_info": {
-          "package_name": "com.brainstudioz.beprepared"
+          "package_name": "lk.mhpss.app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDbS7R0B9onZvDexRsMs5yCvrhjQN5taqc"
+          "current_key": "AIzaSyBaEBwAA_UTi8bslY7d8zoL8PHHmNhxl3g"
         }
       ],
       "services": {

@@ -1,6 +1,6 @@
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/core/utils/widgets/network_image_widget.dart';
-import 'package:beprepared/features/data/models/responses/onboarding_response.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/core/utils/widgets/network_image_widget.dart';
+import 'package:mhpss_app/features/data/models/responses/onboarding_response.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingPage extends StatelessWidget {

@@ -1,7 +1,7 @@
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/features/data/models/responses/resource_by_category_response.dart';
-import 'package:beprepared/features/data/models/responses/toolkit_sub_category_response.dart';
-import 'package:beprepared/features/data/models/responses/video_response.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/features/data/models/responses/resource_by_category_response.dart';
+import 'package:mhpss_app/features/data/models/responses/toolkit_sub_category_response.dart';
+import 'package:mhpss_app/features/data/models/responses/video_response.dart';
 
 // Provider for the API serviceß
 final _apiServiceProvider = Provider<ToolkitRespository>((ref) {

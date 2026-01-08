@@ -1,5 +1,5 @@
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/core/utils/widgets/advance_search_filter.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/core/utils/widgets/advance_search_filter.dart';
 import 'package:flutter/material.dart';
 
 class FavouritesScreen extends ConsumerStatefulWidget {

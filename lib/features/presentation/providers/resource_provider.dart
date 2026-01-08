@@ -1,7 +1,7 @@
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/features/data/models/responses/popular_resources_response.dart';
-import 'package:beprepared/features/data/models/responses/search_response.dart';
-import 'package:beprepared/features/domain/repositories/resources_repository.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/features/data/models/responses/popular_resources_response.dart';
+import 'package:mhpss_app/features/data/models/responses/search_response.dart';
+import 'package:mhpss_app/features/domain/repositories/resources_repository.dart';
 
 // Provider for the API serviceß
 final _apiServiceProvider = Provider<ResourcesRepository>((ref) {

@@ -1,5 +1,5 @@
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/core/utils/widgets/mhpss_logo_text.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/core/utils/widgets/mhpss_logo_text.dart';
 import 'package:flutter/material.dart';
 
 class CountryLanguageScreen extends StatefulWidget {

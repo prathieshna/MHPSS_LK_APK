@@ -1,9 +1,9 @@
 // Provider for the API serviceß
 
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/features/data/models/responses/onboarding_response.dart';
-import 'package:beprepared/features/data/models/responses/pages_response.dart';
-import 'package:beprepared/features/domain/repositories/pages_repository.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/features/data/models/responses/onboarding_response.dart';
+import 'package:mhpss_app/features/data/models/responses/pages_response.dart';
+import 'package:mhpss_app/features/domain/repositories/pages_repository.dart';
 
 final _apiServiceProvider = Provider<PagesRepository>((ref) {
   return PagesRepository();

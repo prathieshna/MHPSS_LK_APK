@@ -1,4 +1,4 @@
-import 'package:beprepared/core/resources/all_imports.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
 
 class PrefsStorage implements IStorage {
   // static late SharedPreferences _prefs;

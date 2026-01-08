@@ -5,7 +5,9 @@
       "Bash(java:*)",
       "Bash(pod repo update:*)",
       "Bash(rm:*)",
-      "Bash(pod install:*)"
+      "Bash(pod install:*)",
+      "Bash(firebase --version:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

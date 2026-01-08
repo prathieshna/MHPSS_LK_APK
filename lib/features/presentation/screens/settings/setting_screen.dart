@@ -1,6 +1,6 @@
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/features/presentation/providers/pages_provider.dart';
-import 'package:beprepared/features/presentation/screens/settings/terms_of_use.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/features/presentation/providers/pages_provider.dart';
+import 'package:mhpss_app/features/presentation/screens/settings/terms_of_use.dart';
 import 'package:flutter/material.dart';
 
 class SettingScreen extends ConsumerStatefulWidget {

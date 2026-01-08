@@ -1,7 +1,7 @@
-import 'package:beprepared/beprepared.dart';
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/core/use%20cases/app_functions.dart';
-import 'package:beprepared/features/presentation/screens/settings/setting_screen.dart';
+import 'package:mhpss_app/mhpss_app.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/core/use%20cases/app_functions.dart';
+import 'package:mhpss_app/features/presentation/screens/settings/setting_screen.dart';
 import 'package:flutter/material.dart';
 
 class BottmTabBarScreen extends ConsumerStatefulWidget {

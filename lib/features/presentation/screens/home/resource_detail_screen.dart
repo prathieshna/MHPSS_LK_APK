@@ -1,5 +1,5 @@
-import 'package:beprepared/core/utils/widgets/network_image_widget.dart';
-import 'package:beprepared/features/presentation/providers/resource_provider.dart'
+import 'package:mhpss_app/core/utils/widgets/network_image_widget.dart';
+import 'package:mhpss_app/features/presentation/providers/resource_provider.dart'
     as rp;
 import 'package:flutter/material.dart';
 

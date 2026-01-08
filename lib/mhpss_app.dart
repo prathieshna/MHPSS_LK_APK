@@ -1,6 +1,6 @@
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/features/data/models/data%20query/graphql_query.dart';
-import 'package:beprepared/features/domain/repositories/local_notifications_handler.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/features/data/models/data%20query/graphql_query.dart';
+import 'package:mhpss_app/features/domain/repositories/local_notifications_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 

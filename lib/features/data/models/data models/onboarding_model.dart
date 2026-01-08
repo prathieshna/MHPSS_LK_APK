@@ -1,5 +1,5 @@
 // lib/models/onboarding_item.dart
-import 'package:beprepared/core/resources/all_imports.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
 
 class OnboardingItem {
   final String title;

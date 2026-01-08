@@ -1,7 +1,7 @@
-import 'package:beprepared/config/routes/navigation_service.dart';
-import 'package:beprepared/core/localStorage/prefs_storage.dart';
-import 'package:beprepared/core/localStorage/storage.dart';
-import 'package:beprepared/core/use%20cases/app_functions.dart';
+import 'package:mhpss_app/config/routes/navigation_service.dart';
+import 'package:mhpss_app/core/localStorage/prefs_storage.dart';
+import 'package:mhpss_app/core/localStorage/storage.dart';
+import 'package:mhpss_app/core/use%20cases/app_functions.dart';
 import 'package:get_it/get_it.dart';
 
 final _locator = GetIt.instance;

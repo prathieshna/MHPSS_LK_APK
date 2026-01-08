@@ -1,6 +1,6 @@
-import 'package:beprepared/beprepared.dart';
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/firebase_options.dart';
+import 'package:mhpss_app/mhpss_app.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/firebase_options.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -10,7 +10,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Firebase is already initialized in main(), no need to initialize again
 }
 
 void main() async {
@@ -22,7 +22,19 @@ void main() async {
 
   // Firebase Init
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Check if Firebase is already initialized to prevent duplicate initialization
+  try {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  } catch (e) {
+    if (e.toString().contains('duplicate-app')) {
+      // Firebase already initialized, this is fine
+      log('Firebase already initialized');
+    } else {
+      // Re-throw if it's a different error
+      rethrow;
+    }
+  }
 
   // Firebase notification
   // await appFunctions.notificationPermission();

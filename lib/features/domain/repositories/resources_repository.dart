@@ -1,7 +1,7 @@
-import 'package:beprepared/beprepared.dart';
-import 'package:beprepared/core/resources/all_imports.dart';
-import 'package:beprepared/features/data/models/responses/popular_resources_response.dart';
-import 'package:beprepared/features/data/models/responses/search_response.dart';
+import 'package:mhpss_app/mhpss_app.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
+import 'package:mhpss_app/features/data/models/responses/popular_resources_response.dart';
+import 'package:mhpss_app/features/data/models/responses/search_response.dart';
 
 abstract class ResourcesRepositoryInterface extends DioClient {}
 

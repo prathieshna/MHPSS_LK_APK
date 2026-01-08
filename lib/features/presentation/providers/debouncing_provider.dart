@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:beprepared/core/resources/all_imports.dart';
+import 'package:mhpss_app/core/resources/all_imports.dart';
 
 class Debounce {
   final Duration duration;
