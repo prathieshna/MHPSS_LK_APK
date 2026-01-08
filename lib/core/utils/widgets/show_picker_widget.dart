@@ -122,10 +122,18 @@ class _PickerWidgetState<T> extends State<PickerWidget<T>> {
   }
 
   Widget _buildBottomSheetFooter(BuildContext context) {
+    // Get the bottom padding to avoid system navigation bar
+    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
+
     return Container(
       width: double.infinity,
       color: Colors.grey.shade200,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 16,
+        bottom: 16 + bottomPadding, // Add extra padding for navigation bar
+      ),
       child: GestureDetector(
         onTap: () => widget.onConfirm != null
             ? widget.onConfirm!()

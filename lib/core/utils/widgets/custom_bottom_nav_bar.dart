@@ -119,7 +119,10 @@ class _BottmTabBarScreenState extends ConsumerState<BottmTabBarScreen>
             _buildOffstageNavigator(TabItems.Settings, 3),
           ],
         ),
-        bottomNavigationBar: CustomBottomNavBar(onTabSelected: _selectTab),
+        bottomNavigationBar: SafeArea(
+          top: false,
+          child: CustomBottomNavBar(onTabSelected: _selectTab),
+        ),
       ),
     );
   }
