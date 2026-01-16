@@ -2,6 +2,7 @@ import 'package:mhpss_app/mhpss_app.dart';
 import 'package:mhpss_app/core/resources/all_imports.dart';
 import 'package:mhpss_app/features/data/models/responses/popular_resources_response.dart';
 import 'package:mhpss_app/features/data/models/responses/search_response.dart';
+import 'package:mhpss_app/features/data/models/responses/resources_by_slug_response.dart';
 
 abstract class ResourcesRepositoryInterface extends DioClient {}
 
@@ -113,6 +114,33 @@ class ResourcesRepository extends ResourcesRepositoryInterface {
       }
     } catch (e, stackTrace) {
       log("Error in search: $e");
+      log("Stack trace: $stackTrace");
+      rethrow;
+    }
+  }
+
+  // New method to fetch all resources by slug (for getting all translations)
+  Future<ResourcesBySlugResponse> getResourcesBySlugRepository(String slug) async {
+    print("🔍 [DEBUG] Fetching resources by slug: $slug");
+    try {
+      final response = await post(
+        baseUrl,
+        data: {
+          "query": ResourcesQuery.getResourcesBySlugQuery(slug),
+        },
+      );
+
+      log("resources by slug response: ${response.data}");
+      log("resources by slug status code: ${response.statusCode}");
+
+      if (response.statusCode == 200 && response.data != null) {
+        return ResourcesBySlugResponse.fromJson(response.data);
+      } else {
+        throw Exception(
+            'Failed to load resources by slug: ${response.statusMessage}');
+      }
+    } catch (e, stackTrace) {
+      log("Error fetching resources by slug: $e");
       log("Stack trace: $stackTrace");
       rethrow;
     }

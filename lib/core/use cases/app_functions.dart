@@ -332,14 +332,102 @@ class AppFunctions implements IAppFunctions {
     }
   }
 
+  // Helper function to convert Google Drive sharing links to direct download links
+  String _convertGoogleDriveLink(String url) {
+    // Check if it's a Google Drive link
+    if (url.contains('drive.google.com')) {
+      // Extract file ID from various Google Drive URL formats
+      // Format 1: https://drive.google.com/file/d/FILE_ID/view
+      RegExp fileIdRegex = RegExp(r'/d/([a-zA-Z0-9_-]+)');
+      Match? match = fileIdRegex.firstMatch(url);
+
+      if (match != null && match.groupCount > 0) {
+        String fileId = match.group(1)!;
+        // Convert to direct download link
+        return 'https://drive.google.com/uc?export=download&id=$fileId';
+      }
+
+      // Format 2: Already in id= format
+      if (url.contains('id=')) {
+        RegExp idRegex = RegExp(r'id=([a-zA-Z0-9_-]+)');
+        Match? idMatch = idRegex.firstMatch(url);
+        if (idMatch != null && idMatch.groupCount > 0) {
+          String fileId = idMatch.group(1)!;
+          return 'https://drive.google.com/uc?export=download&id=$fileId';
+        }
+      }
+
+      // Format 3: Open link format
+      // https://drive.google.com/open?id=FILE_ID
+      if (url.contains('open?id=')) {
+        RegExp openIdRegex = RegExp(r'open\?id=([a-zA-Z0-9_-]+)');
+        Match? openMatch = openIdRegex.firstMatch(url);
+        if (openMatch != null && openMatch.groupCount > 0) {
+          String fileId = openMatch.group(1)!;
+          return 'https://drive.google.com/uc?export=download&id=$fileId';
+        }
+      }
+    }
+
+    // Return original URL if not a Google Drive link
+    return url;
+  }
+
+  // Helper function to sanitize and truncate filename
+  String _sanitizeFilename(String fileName, {int maxLength = 100}) {
+    // Remove invalid characters for filenames
+    String sanitized = fileName
+        .replaceAll(RegExp(r'[<>:"/\\|?*\x00-\x1F]'), '_')
+        .replaceAll(RegExp(r'\s+'), '_')
+        .trim();
+
+    // Get file extension if present
+    String extension = '';
+    int lastDot = sanitized.lastIndexOf('.');
+    if (lastDot > 0 && lastDot < sanitized.length - 1) {
+      extension = sanitized.substring(lastDot);
+      sanitized = sanitized.substring(0, lastDot);
+    }
+
+    // Truncate if too long (leave room for extension and random suffix)
+    if (sanitized.length > maxLength) {
+      sanitized = sanitized.substring(0, maxLength);
+    }
+
+    return sanitized + extension;
+  }
+
   @override
   Future<String?> downloadFile(String url, String fileName) async {
     final dir = await getApplicationDocumentsDirectory();
-    final filePath = "${dir.path}/$fileName-${await generateRandomString(4)}";
+
+    // Sanitize and truncate the filename to avoid "File name too long" errors
+    final sanitizedFileName = _sanitizeFilename(fileName, maxLength: 80);
+    final randomSuffix = await generateRandomString(4);
+    final filePath = "${dir.path}/${sanitizedFileName}_$randomSuffix";
 
     try {
-      // Download the file
-      final response = await Dio().download(url, filePath);
+      // Convert Google Drive links to direct download links
+      final downloadUrl = _convertGoogleDriveLink(url);
+      print("Original URL: $url");
+      print("Download URL: $downloadUrl");
+      print("Sanitized filename: $sanitizedFileName");
+
+      // Download the file with redirect following enabled
+      final dio = Dio(BaseOptions(
+        followRedirects: true,
+        maxRedirects: 5,
+      ));
+
+      final response = await dio.download(
+        downloadUrl,
+        filePath,
+        options: Options(
+          responseType: ResponseType.bytes,
+          followRedirects: true,
+          validateStatus: (status) => status! < 500,
+        ),
+      );
 
       if (response.statusCode == 200) {
         print("File downloaded and saved: $filePath");
@@ -358,7 +446,10 @@ class AppFunctions implements IAppFunctions {
     if (imageUrl.isEmpty) return null;
 
     final dir = await getApplicationDocumentsDirectory();
-    final imageFileName = "img_$fileName";
+
+    // Sanitize filename to avoid "File name too long" errors
+    final sanitizedFileName = _sanitizeFilename(fileName, maxLength: 80);
+    final imageFileName = "img_$sanitizedFileName";
     final imagePath = "${dir.path}/$imageFileName";
 
     try {
@@ -367,8 +458,24 @@ class AppFunctions implements IAppFunctions {
         return imagePath;
       }
 
-      // Download the image
-      final response = await Dio().download(imageUrl, imagePath);
+      // Convert Google Drive links to direct download links
+      final downloadUrl = _convertGoogleDriveLink(imageUrl);
+
+      // Download the image with redirect following enabled
+      final dio = Dio(BaseOptions(
+        followRedirects: true,
+        maxRedirects: 5,
+      ));
+
+      final response = await dio.download(
+        downloadUrl,
+        imagePath,
+        options: Options(
+          responseType: ResponseType.bytes,
+          followRedirects: true,
+          validateStatus: (status) => status! < 500,
+        ),
+      );
 
       if (response.statusCode == 200) {
         print("Image downloaded and saved: $imagePath");

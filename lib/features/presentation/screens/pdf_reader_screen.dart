@@ -29,6 +29,48 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
   bool _isLoading = true;
   bool _loadError = false;
 
+  // Helper function to convert Google Drive sharing links to direct download links
+  String _convertGoogleDriveLink(String url) {
+    // Check if it's a Google Drive link
+    if (url.contains('drive.google.com')) {
+      // Extract file ID from various Google Drive URL formats
+      // Format 1: https://drive.google.com/file/d/FILE_ID/view
+      RegExp fileIdRegex = RegExp(r'/d/([a-zA-Z0-9_-]+)');
+      Match? match = fileIdRegex.firstMatch(url);
+
+      if (match != null && match.groupCount > 0) {
+        String fileId = match.group(1)!;
+        // Convert to direct download link
+        // Using uc?export=download format works better for PDFs
+        return 'https://drive.google.com/uc?export=download&id=$fileId';
+      }
+
+      // Format 2: Already in id= format
+      if (url.contains('id=')) {
+        RegExp idRegex = RegExp(r'id=([a-zA-Z0-9_-]+)');
+        Match? idMatch = idRegex.firstMatch(url);
+        if (idMatch != null && idMatch.groupCount > 0) {
+          String fileId = idMatch.group(1)!;
+          return 'https://drive.google.com/uc?export=download&id=$fileId';
+        }
+      }
+
+      // Format 3: Open link format
+      // https://drive.google.com/open?id=FILE_ID
+      if (url.contains('open?id=')) {
+        RegExp openIdRegex = RegExp(r'open\?id=([a-zA-Z0-9_-]+)');
+        Match? openMatch = openIdRegex.firstMatch(url);
+        if (openMatch != null && openMatch.groupCount > 0) {
+          String fileId = openMatch.group(1)!;
+          return 'https://drive.google.com/uc?export=download&id=$fileId';
+        }
+      }
+    }
+
+    // Return original URL if not a Google Drive link
+    return url;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -91,21 +133,30 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
       {int maxRetries = 3}) async {
     int retryCount = 0;
 
+    // Convert Google Drive links to direct download links
+    final downloadUrl = _convertGoogleDriveLink(url);
+    print("Original PDF URL: $url");
+    print("Download PDF URL: $downloadUrl");
+
     while (retryCount < maxRetries) {
       try {
         final dio = Dio()
           ..options.connectTimeout = const Duration(seconds: 30)
           ..options.receiveTimeout = const Duration(seconds: 60)
-          ..options.sendTimeout = const Duration(seconds: 30);
+          ..options.sendTimeout = const Duration(seconds: 30)
+          ..options.followRedirects = true
+          ..options.maxRedirects = 5;
 
         final response = await dio.get<List<int>>(
-          url,
+          downloadUrl,
           options: Options(
             responseType: ResponseType.bytes,
+            followRedirects: true,
+            validateStatus: (status) => status! < 500,
             headers: {
               'Accept': 'application/pdf',
               'User-Agent':
-                  'YourApp/1.0', // Using a custom User-Agent might help in some cases
+                  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             },
           ),
         );
@@ -114,7 +165,27 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
           throw Exception('failed_to_download_pdf_empty_response'.tr());
         }
 
-        return Uint8List.fromList(response.data!);
+        final bytes = Uint8List.fromList(response.data!);
+
+        // Check if the response is actually a PDF and not an HTML error page
+        // PDF files start with "%PDF" (bytes: 0x25 0x50 0x44 0x46)
+        if (bytes.length > 4) {
+          final isPdf = bytes[0] == 0x25 && bytes[1] == 0x50 && bytes[2] == 0x44 && bytes[3] == 0x46;
+          if (!isPdf) {
+            print("Response is not a PDF file. Might be an HTML page or error.");
+            // For Google Drive, try the alternate download URL format
+            if (url.contains('drive.google.com') && retryCount == 0) {
+              print("Retrying with alternate Google Drive format");
+              throw DioException(
+                requestOptions: response.requestOptions,
+                type: DioExceptionType.badResponse,
+                message: "Not a PDF response",
+              );
+            }
+          }
+        }
+
+        return bytes;
       } on DioException catch (e) {
         retryCount++;
         if (retryCount >= maxRetries) {

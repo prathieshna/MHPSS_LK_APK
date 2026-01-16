@@ -81,47 +81,97 @@ class ResourcesQuery {
   }
 
   static String getSingleResourceQuery(String? id, String locale) {
-    print("qurey id: $id");
+    print("query id: $id");
+    // First, we need to get the resource to find its slug
+    // Then we can query all resources with that slug
+    // For now, keeping simple - will handle in UI layer
     return """
       query {
-             resource(where: { id: "$id" }) {
-            accessToMaterials
-            author
-            dataType
-            description
-            descriptionDeprecated
+        resource(where: { id: "$id" }) {
+          accessToMaterials
+          author
+          dataType
+          description
+          descriptionDeprecated
+          id
+          order
+          publishedAt
+          publishingDate
+          slug
+          stage
+          tags
+          title
+          updatedAt
+          resourceDocument {
             id
-            order
-            publishedAt
-            publishingDate
-            slug
-            stage
-            tags
+            link
             title
-            updatedAt
-            resourceDocument {
-                id
-                link
-                title
-                resourceTranslations(where: { language: $locale }) {
-                    createdAt
-                    id
-                    language
-                    link
-                    publishedAt
-                    stage
-                    updatedAt
-                }
-                fileFormat
+            resourceTranslations {
+              createdAt
+              id
+              language
+              link
+              publishedAt
+              stage
+              updatedAt
             }
-            resourceCategory
-            image {
-                id
-                url
-            }
-            toolkitCategories {
+            fileFormat
+          }
+          resourceCategory
+          image {
             id
-           }
+            url
+          }
+          toolkitCategories {
+            id
+          }
+        }
+      }
+    """;
+  }
+
+  // New query to get all resources by slug (for translations)
+  static String getResourcesBySlugQuery(String slug) {
+    return """
+      query {
+        resources(where: { slug: "$slug" }) {
+          accessToMaterials
+          author
+          dataType
+          description
+          descriptionDeprecated
+          id
+          order
+          publishedAt
+          publishingDate
+          slug
+          stage
+          tags
+          title
+          updatedAt
+          resourceDocument {
+            id
+            link
+            title
+            resourceTranslations {
+              createdAt
+              id
+              language
+              link
+              publishedAt
+              stage
+              updatedAt
+            }
+            fileFormat
+          }
+          resourceCategory
+          image {
+            id
+            url
+          }
+          toolkitCategories {
+            id
+          }
         }
       }
     """;

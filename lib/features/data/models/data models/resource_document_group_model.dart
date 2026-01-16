@@ -1,15 +1,20 @@
 import 'package:mhpss_app/features/data/models/responses/single_resource_response.dart';
 
 class ResourceDocumentGroups {
-  final SingleResourceDocument? pdfDocument;
-  final SingleResourceDocument? audioDocument;
-  final SingleResourceDocument? videoDocument;
+  final List<SingleResourceDocument> pdfDocuments;
+  final List<SingleResourceDocument> audioDocuments;
+  final List<SingleResourceDocument> videoDocuments;
 
   ResourceDocumentGroups({
-    this.pdfDocument,
-    this.audioDocument,
-    this.videoDocument,
+    this.pdfDocuments = const [],
+    this.audioDocuments = const [],
+    this.videoDocuments = const [],
   });
+
+  // Convenience getters for backwards compatibility
+  SingleResourceDocument? get pdfDocument => pdfDocuments.isNotEmpty ? pdfDocuments.first : null;
+  SingleResourceDocument? get audioDocument => audioDocuments.isNotEmpty ? audioDocuments.first : null;
+  SingleResourceDocument? get videoDocument => videoDocuments.isNotEmpty ? videoDocuments.first : null;
 
   factory ResourceDocumentGroups.fromResource(SingleResourceDetails? resource) {
     if (resource?.resourceDocument == null) {
@@ -17,26 +22,29 @@ class ResourceDocumentGroups {
     }
 
     return ResourceDocumentGroups(
-      pdfDocument: resource!.resourceDocument!.firstWhereOrNull((doc) =>
-          (doc.fileFormat?.toLowerCase() == 'pdf') || (doc.fileFormat == null)),
-      audioDocument: resource.resourceDocument!.firstWhereOrNull(
-          (doc) => (doc.fileFormat?.toLowerCase() == 'audio')),
-      videoDocument: resource.resourceDocument!.firstWhereOrNull(
-          (doc) => (doc.fileFormat?.toLowerCase() == 'video')),
+      pdfDocuments: resource!.resourceDocument!
+          .where((doc) => (doc.fileFormat?.toLowerCase() == 'pdf') || (doc.fileFormat == null))
+          .toList(),
+      audioDocuments: resource.resourceDocument!
+          .where((doc) => (doc.fileFormat?.toLowerCase() == 'audio'))
+          .toList(),
+      videoDocuments: resource.resourceDocument!
+          .where((doc) => (doc.fileFormat?.toLowerCase() == 'video'))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'pdfDocument': pdfDocument?.toJson(),
-      'audioDocument': audioDocument?.toJson(),
-      'videoDocument': videoDocument?.toJson(),
+      'pdfDocuments': pdfDocuments.map((doc) => doc.toJson()).toList(),
+      'audioDocuments': audioDocuments.map((doc) => doc.toJson()).toList(),
+      'videoDocuments': videoDocuments.map((doc) => doc.toJson()).toList(),
     };
   }
 
   @override
   String toString() =>
-      'ResourceDocumentGroups(pdfDocument: $pdfDocument, audioDocument: $audioDocument, videoDocument: $videoDocument)';
+      'ResourceDocumentGroups(pdfDocuments: $pdfDocuments, audioDocuments: $audioDocuments, videoDocuments: $videoDocuments)';
 }
 
 extension FirstWhereOrNullExtension<E> on Iterable<E> {

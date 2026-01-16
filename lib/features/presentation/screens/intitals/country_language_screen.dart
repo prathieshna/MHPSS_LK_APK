@@ -202,7 +202,7 @@ class _CountryLanguageScreenState extends State<CountryLanguageScreen> {
           children: [
             const MHPSSLogoText(fontSize: 32),
             SizedBox(
-              width: 170.w,
+              width: 220.w,
               child: Column(
                 children: [
                   _buildOptionTile(
@@ -313,19 +313,22 @@ class _CountryLanguageScreenState extends State<CountryLanguageScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         elevation: 0.0,
-                        padding: EdgeInsets.symmetric(horizontal: 34.0),
+                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
                         backgroundColor: AppColors.appWhiteColor,
-                        minimumSize: Size(170.w, 40.h),
+                        minimumSize: Size(220.w, 44.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
-                      child: Text(
-                        "save_changes".tr(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: AppColors.textBlackColor,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          "save_changes".tr(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: AppColors.textBlackColor,
+                          ),
                         ),
                       ),
                     )
@@ -347,8 +350,8 @@ class _CountryLanguageScreenState extends State<CountryLanguageScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 40.h,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        height: 44.h,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -357,16 +360,17 @@ class _CountryLanguageScreenState extends State<CountryLanguageScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(icon),
+            Icon(icon, size: 20),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 title,
+                textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14.sp),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(Icons.arrow_drop_down),
+            const Icon(Icons.arrow_drop_down, size: 20),
           ],
         ),
       ),

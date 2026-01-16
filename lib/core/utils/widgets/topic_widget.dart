@@ -15,24 +15,30 @@ class TitleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          children: [
-            Container(
-              padding: EdgeInsets.only(bottom: 2.h),
-              decoration: const BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(
-                          color: AppColors.textTitleColor, width: 2.0))),
-              child: Text(topic,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                  )),
-            )
-          ],
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.only(bottom: 2.h),
+                decoration: const BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                            color: AppColors.textTitleColor, width: 2.0))),
+                child: Text(topic,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    )),
+              )
+            ],
+          ),
         ),
-        const Spacer(),
+        const SizedBox(width: 8),
         AppButton(onPressed: onPressed, text: forwardText),
       ],
     );

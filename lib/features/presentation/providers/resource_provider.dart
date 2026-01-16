@@ -1,6 +1,7 @@
 import 'package:mhpss_app/core/resources/all_imports.dart';
 import 'package:mhpss_app/features/data/models/responses/popular_resources_response.dart';
 import 'package:mhpss_app/features/data/models/responses/search_response.dart';
+import 'package:mhpss_app/features/data/models/responses/resources_by_slug_response.dart';
 import 'package:mhpss_app/features/domain/repositories/resources_repository.dart';
 
 // Provider for the API serviceß
@@ -14,6 +15,16 @@ final singleResourcesDataProvider =
     print("FutureProvider id: $id");
     final apiService = ref.watch(_apiServiceProvider);
     return apiService.getSingleResourceRepository(id);
+  },
+);
+
+// Provider to fetch all resources by slug (for translations)
+final resourcesBySlugProvider =
+    FutureProvider.autoDispose.family<ResourcesBySlugResponse, String>(
+  (ref, slug) async {
+    print("🔍 [DEBUG] resourcesBySlugProvider: Fetching resources for slug: $slug");
+    final apiService = ref.watch(_apiServiceProvider);
+    return apiService.getResourcesBySlugRepository(slug);
   },
 );
 

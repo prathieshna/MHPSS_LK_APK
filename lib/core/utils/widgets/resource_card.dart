@@ -1,5 +1,6 @@
 import 'package:mhpss_app/core/resources/all_imports.dart';
 import 'package:mhpss_app/core/utils/widgets/network_image_widget.dart';
+import 'package:mhpss_app/core/utils/language_utils.dart';
 import 'package:flutter/material.dart';
 
 class ResourceCard extends StatelessWidget {
@@ -214,12 +215,16 @@ class ResourceCard extends StatelessWidget {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  GestureDetector(
-                                      onTap: downloadTap,
-                                      child: SvgPicture.asset(
-                                        AppImages.downloadSvg,
-                                      )),
-                                  SizedBox(width: 10.w),
+                                  // Show download button if resource has any downloadable documents
+                                  // (PDF, DOCX, XLSX, etc.)
+                                  if (pdfDocument == true || audioDocument == true || videoDocument == true)
+                                    GestureDetector(
+                                        onTap: downloadTap,
+                                        child: SvgPicture.asset(
+                                          AppImages.downloadSvg,
+                                        )),
+                                  if (pdfDocument == true || audioDocument == true || videoDocument == true)
+                                    SizedBox(width: 10.w),
                                   GestureDetector(
                                       onTap: favouriteTap,
                                       child: SvgPicture.asset(isFavourite
@@ -252,7 +257,7 @@ class ResourceCard extends StatelessWidget {
                                 },
                                 child: Chip(
                                   label: Text(
-                                    lang['language']!,
+                                    LanguageUtils.getLanguageName(lang['language']!),
                                     style: const TextStyle(fontSize: 12),
                                   ),
                                   backgroundColor: Colors.transparent,

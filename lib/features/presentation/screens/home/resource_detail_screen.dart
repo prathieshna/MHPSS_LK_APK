@@ -4,6 +4,7 @@ import 'package:mhpss_app/features/presentation/providers/resource_provider.dart
 import 'package:flutter/material.dart';
 
 import '../../../../core/resources/all_imports.dart';
+import '../../../../core/utils/language_utils.dart';
 
 class ResourceDetailsScreen extends ConsumerStatefulWidget {
   final String? id;
@@ -23,6 +24,33 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
   String? selectedLink;
   String? selectedLanguage;
 
+  // Helper function to check if a link should be opened in PDF reader
+  bool _shouldOpenInPdfReader(String link) {
+    // Check if it's a direct PDF link
+    if (link.toLowerCase().endsWith('.pdf')) {
+      return true;
+    }
+
+    // Check if it's a Google Drive link
+    // Note: Google Drive links without extension should be treated as PDFs
+    // unless they're explicitly other formats (xlsx, docx, etc.)
+    if (link.contains('drive.google.com')) {
+      // If it's a Google Drive link and doesn't have a non-PDF extension, treat as PDF
+      final lowerLink = link.toLowerCase();
+      if (lowerLink.contains('.xlsx') ||
+          lowerLink.contains('.docx') ||
+          lowerLink.contains('.pptx') ||
+          lowerLink.contains('.xls') ||
+          lowerLink.contains('.doc') ||
+          lowerLink.contains('.ppt')) {
+        return false; // Not a PDF, will be opened with external app
+      }
+      return true; // Assume PDF for Google Drive links
+    }
+
+    return false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -38,21 +66,44 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
     newExpandedSections.add('actions_for_heroes');
     ref.read(rp.expandedSectionProvider.notifier).state = newExpandedSections;
 
-    // Add a small delay to ensure the section is expanded
-    Future.delayed(const Duration(milliseconds: 100), () {
+    // Add a longer delay to ensure the section is fully expanded and rendered
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+
       if (languageSectionKey.currentContext != null) {
         Scrollable.ensureVisible(
           languageSectionKey.currentContext!,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
         ).then((_) {
-          setState(() {
-            _hasScrolled = true;
-          });
+          if (mounted) {
+            setState(() {
+              _hasScrolled = true;
+            });
+          }
+        });
+      } else {
+        // If context is still not available, try one more time
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (!mounted) return;
+          if (languageSectionKey.currentContext != null) {
+            Scrollable.ensureVisible(
+              languageSectionKey.currentContext!,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            ).then((_) {
+              if (mounted) {
+                setState(() {
+                  _hasScrolled = true;
+                });
+              }
+            });
+          }
         });
       }
     });
   }
+
 
   @override
   void dispose() {
@@ -283,81 +334,122 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                             // PDF section
                             if (documentGroups.pdfDocument != null &&
                                 singleResourceData
-                                    .resource!.resourceDocument!.isNotEmpty)
-                              _buildExpandableResourceSection(
-                                ref,
-                                'actions_for_heroes',
-                                singleResourceData.resource!.title ?? "",
-                                // 'actions_for_heroes'.tr(),
-                                AppImages.docIcon,
-                                key: languageSectionKey,
-                                content: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'select_language:'.tr(),
-                                      style: TextStyle(
-                                        fontSize: 11.6.sp,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Wrap(
+                                    .resource!.resourceDocument!.isNotEmpty &&
+                                singleResourceData.resource!.slug != null)
+                              ref
+                                  .watch(rp.resourcesBySlugProvider(
+                                      singleResourceData.resource!.slug!))
+                                  .when(
+                                    data: (resourcesBySlug) {
+                                      // Collect ALL translations from ALL resources with this slug
+                                      // Include PDF and all other downloadable formats (XLSX, DOCX, etc.)
+                                      final allPdfTranslations = <ResourceTranslation>[];
+
+                                      for (var resource in resourcesBySlug.resources) {
+                                        if (resource.resourceDocument != null) {
+                                          for (var doc in resource.resourceDocument!) {
+                                            // Include all file formats (PDF, XLSX, DOCX, PPT, etc.)
+                                            if (doc.resourceTranslations != null) {
+                                              allPdfTranslations.addAll(doc.resourceTranslations!);
+                                            }
+                                          }
+                                        }
+                                      }
+
+                                      return _buildExpandableResourceSection(
+                                    ref,
+                                    'actions_for_heroes',
+                                    singleResourceData.resource!.title ?? "",
+                                    // 'actions_for_heroes'.tr(),
+                                    AppImages.docIcon,
+                                    key: languageSectionKey,
+                                    preview: Wrap(
                                       spacing: 6,
                                       runSpacing: -8,
-                                      children: documentGroups
-                                              .pdfDocument?.resourceTranslations
-                                              ?.map((lang) {
-                                            // print("lang: ${lang.language}");
-                                            return Chip(
-                                              label: Text(lang.language ?? ""),
+                                      children: allPdfTranslations.map((translation) {
+                                        return Chip(
+                                          label: Text(LanguageUtils.getLanguageName(translation.language ?? "")),
+                                          padding: EdgeInsets.all(0),
+                                          labelStyle: TextStyle(
+                                              fontSize: 11.6.sp,
+                                              fontWeight: FontWeight.w400),
+                                        );
+                                      }).toList(),
+                                    ),
+                                    content: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'select_language:'.tr(),
+                                          style: TextStyle(
+                                            fontSize: 11.6.sp,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Wrap(
+                                          spacing: 6,
+                                          runSpacing: -8,
+                                          children: allPdfTranslations.map((translation) {
+                                            return ActionChip(
+                                              label: Text(LanguageUtils.getLanguageName(translation.language ?? "")),
                                               padding: EdgeInsets.all(0),
                                               labelStyle: TextStyle(
                                                   fontSize: 11.6.sp,
-                                                  fontWeight: FontWeight.w400),
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Colors.blue),
+                                              onPressed: () async {
+                                                // Directly open the PDF/link for this language
+                                                final link = translation.link;
+                                                final language = translation.language ?? "";
+
+                                                if (link != null && link.isNotEmpty) {
+                                                  if (_shouldOpenInPdfReader(link)) {
+                                                    navigator.navigateTo(
+                                                      PdfReaderScreen(
+                                                        pdfLink: link,
+                                                        language: language,
+                                                        resourceDetails: singleResourceData.resource!,
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    appFunctions.openWebUrl(link);
+                                                  }
+                                                } else {
+                                                  Utils.displayToast('No link available for this language'.tr());
+                                                }
+                                              },
                                             );
-                                          }).toList() ??
-                                          [],
-                                    )
-                                  ],
-                                ),
-                                onTap: documentGroups.pdfDocument!
-                                        .resourceTranslations!.isNotEmpty
-                                    ? () {
-                                        _showPicker(
-                                          context,
-                                          documentGroups.pdfDocument!
-                                                  .resourceTranslations ??
-                                              [],
-                                          'select_language'.tr(),
-                                          singleResourceData.resource!,
-                                        );
-                                      }
-                                    : () async {
+                                          }).toList(),
+                                        )
+                                      ],
+                                    ),
+                                    onTap: allPdfTranslations.isNotEmpty
+                                        ? () {
+                                            // Keep the picker as alternative way to select
+                                            _showPicker(
+                                              context,
+                                              allPdfTranslations,
+                                              'select_language'.tr(),
+                                              singleResourceData.resource!,
+                                            );
+                                          }
+                                        : () async {
                                         try {
                                           if (documentGroups.pdfDocument !=
                                               null) {
-                                            final languageCheck = documentGroups
-                                                .pdfDocument!.link
-                                                ?.endsWith(".pdf");
-                                            if (languageCheck == true) {
+                                            final link = documentGroups.pdfDocument!.link ?? "";
+                                            if (_shouldOpenInPdfReader(link)) {
                                               navigator.navigateTo(
                                                   PdfReaderScreen(
-                                                      pdfLink:
-                                                          documentGroups
-                                                                  .pdfDocument!
-                                                                  .link ??
-                                                              "",
+                                                      pdfLink: link,
                                                       language: "English",
                                                       resourceDetails:
                                                           singleResourceData
                                                               .resource!));
                                             } else {
-                                              appFunctions.openWebUrl(
-                                                  documentGroups
-                                                          .pdfDocument!.link ??
-                                                      "");
+                                              appFunctions.openWebUrl(link);
                                             }
                                           } else {
                                             Utils.displayToast(
@@ -368,7 +460,107 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                               'download_failed'.tr());
                                         }
                                       },
-                              ),
+                                  );
+                                    },
+                                    loading: () => _buildExpandableResourceSection(
+                                      ref,
+                                      'actions_for_heroes',
+                                      singleResourceData.resource!.title ?? "",
+                                      AppImages.docIcon,
+                                      key: languageSectionKey,
+                                      content: const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                      onTap: () {},
+                                    ),
+                                    error: (error, stack) {
+                                      // Fallback to original behavior if slug query fails
+                                      final allPdfTranslations = <ResourceTranslation>[];
+                                      for (var pdfDoc in documentGroups.pdfDocuments) {
+                                        if (pdfDoc.resourceTranslations != null) {
+                                          allPdfTranslations.addAll(pdfDoc.resourceTranslations!);
+                                        }
+                                      }
+
+                                      return _buildExpandableResourceSection(
+                                        ref,
+                                        'actions_for_heroes',
+                                        singleResourceData.resource!.title ?? "",
+                                        AppImages.docIcon,
+                                        key: languageSectionKey,
+                                        preview: Wrap(
+                                          spacing: 6,
+                                          runSpacing: -8,
+                                          children: allPdfTranslations.map((translation) {
+                                            return Chip(
+                                              label: Text(LanguageUtils.getLanguageName(translation.language ?? "")),
+                                              padding: EdgeInsets.all(0),
+                                              labelStyle: TextStyle(
+                                                  fontSize: 11.6.sp,
+                                                  fontWeight: FontWeight.w400),
+                                            );
+                                          }).toList(),
+                                        ),
+                                        content: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'select_language:'.tr(),
+                                              style: TextStyle(
+                                                fontSize: 11.6.sp,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            Wrap(
+                                              spacing: 6,
+                                              runSpacing: -8,
+                                              children: allPdfTranslations.map((translation) {
+                                                return ActionChip(
+                                                  label: Text(LanguageUtils.getLanguageName(translation.language ?? "")),
+                                                  padding: EdgeInsets.all(0),
+                                                  labelStyle: TextStyle(
+                                                      fontSize: 11.6.sp,
+                                                      fontWeight: FontWeight.w400,
+                                                      color: Colors.blue),
+                                                  onPressed: () async {
+                                                    final link = translation.link;
+                                                    final language = translation.language ?? "";
+
+                                                    if (link != null && link.isNotEmpty) {
+                                                      if (_shouldOpenInPdfReader(link)) {
+                                                        navigator.navigateTo(
+                                                          PdfReaderScreen(
+                                                            pdfLink: link,
+                                                            language: language,
+                                                            resourceDetails: singleResourceData.resource!,
+                                                          ),
+                                                        );
+                                                      } else {
+                                                        appFunctions.openWebUrl(link);
+                                                      }
+                                                    } else {
+                                                      Utils.displayToast('No link available for this language'.tr());
+                                                    }
+                                                  },
+                                                );
+                                              }).toList(),
+                                            )
+                                          ],
+                                        ),
+                                        onTap: allPdfTranslations.isNotEmpty
+                                            ? () {
+                                                _showPicker(
+                                                  context,
+                                                  allPdfTranslations,
+                                                  'select_language'.tr(),
+                                                  singleResourceData.resource!,
+                                                );
+                                              }
+                                            : () {},
+                                      );
+                                    },
+                                  ),
 
                             // Audio Section
                             if (documentGroups.audioDocument != null)
@@ -679,7 +871,7 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
       builder: (context) => PickerWidget<ResourceTranslation>(
         title: title,
         items: items,
-        itemToString: (item) => item.language ?? "",
+        itemToString: (item) => LanguageUtils.getLanguageName(item.language ?? ""),
         onItemSelected: (selectedItem) {
           setState(() {
             selectedLink = selectedItem.link;
@@ -690,9 +882,8 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
           navigator.pop(context);
           await Future.delayed(Duration(milliseconds: 100));
           print("selectedLanguage: $selectedLink");
-          final languageCheck = selectedLink?.endsWith(".pdf");
 
-          if (selectedLink != null && languageCheck == true) {
+          if (selectedLink != null && _shouldOpenInPdfReader(selectedLink!)) {
             navigator.navigateTo(PdfReaderScreen(
               pdfLink: selectedLink ?? "",
               language: selectedLanguage ?? "",
@@ -777,6 +968,7 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
     String title,
     String iconData, {
     Widget? content,
+    Widget? preview,  // Add preview widget that shows when collapsed
     Function()? onTap,
     Key? key,
   }) {
@@ -812,6 +1004,13 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                       newExpandedSections;
                 },
           ),
+          // Show preview when collapsed
+          if (!isExpanded && preview != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 12.0),
+              child: preview,
+            ),
+          // Show full content when expanded
           if (isExpanded)
             Padding(
               padding:
