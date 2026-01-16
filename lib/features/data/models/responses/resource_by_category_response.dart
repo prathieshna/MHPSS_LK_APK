@@ -93,6 +93,7 @@ class Resource {
   final String createdAt;
   final String author;
   final dynamic descriptionDeprecated;
+  final String? language; // Resource-level language field
   final List<ResourceDocument> resourceDocument;
 
   Resource({
@@ -105,6 +106,7 @@ class Resource {
     required this.createdAt,
     required this.author,
     this.descriptionDeprecated,
+    this.language,
     required this.resourceDocument,
   });
 
@@ -119,6 +121,7 @@ class Resource {
       createdAt: json['createdAt']?.toString() ?? '',
       author: json['author']?.toString() ?? '',
       descriptionDeprecated: json['descriptionDeprecated'],
+      language: json['language']?.toString(),
       resourceDocument: _parseResourceDocuments(json['resourceDocument']),
     );
   }
@@ -146,6 +149,7 @@ class Resource {
       'createdAt': createdAt,
       'author': author,
       'descriptionDeprecated': descriptionDeprecated,
+      'language': language,
       'resourceDocument': resourceDocument.map((e) => e.toJson()).toList(),
     };
   }
@@ -170,48 +174,24 @@ class Image {
 }
 
 class ResourceDocument {
-  final List<ResourceTranslation> resourceTranslations;
+  final String? id;
+  final String? language;
+  final String? link;
   final String? fileFormat;
 
   ResourceDocument({
-    required this.resourceTranslations,
+    this.id,
+    this.language,
+    this.link,
     this.fileFormat,
   });
 
   factory ResourceDocument.fromJson(Map<String, dynamic> json) {
     return ResourceDocument(
-      resourceTranslations:
-          _parseResourceTranslations(json['resourceTranslations']),
-      fileFormat: json['fileFormat']?.toString(),
-    );
-  }
-
-  static List<ResourceTranslation> _parseResourceTranslations(dynamic value) {
-    if (value is! List) return [];
-    return value
-        .map((trans) => ResourceTranslation.fromJson(trans ?? {}))
-        .toList();
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'resourceTranslations':
-          resourceTranslations.map((e) => e.toJson()).toList(),
-      'fileFormat': fileFormat,
-    };
-  }
-}
-
-class ResourceTranslation {
-  final String id;
-  final String? language;
-
-  ResourceTranslation({required this.id, this.language});
-
-  factory ResourceTranslation.fromJson(Map<String, dynamic> json) {
-    return ResourceTranslation(
-      id: json['id']?.toString() ?? '',
+      id: json['id']?.toString(),
       language: json['language']?.toString(),
+      link: json['link']?.toString(),
+      fileFormat: json['fileFormat']?.toString(),
     );
   }
 
@@ -219,6 +199,8 @@ class ResourceTranslation {
     return {
       'id': id,
       'language': language,
+      'link': link,
+      'fileFormat': fileFormat,
     };
   }
 }

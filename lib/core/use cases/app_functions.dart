@@ -173,7 +173,9 @@ class AppFunctions implements IAppFunctions {
 
     try {
       if (await canLaunchUrl(launchUri)) {
-        await launchUrl(launchUri);
+        // Use externalApplication mode to open in browser/external app
+        // This is needed for file downloads (xlsx, docx, etc.)
+        await launchUrl(launchUri, mode: LaunchMode.externalApplication);
       } else {
         throw 'Could not launch $launchUri';
       }

@@ -17,11 +17,10 @@ class ResourcesQuery {
               createdAt
               author
               descriptionDeprecated
+              language
               resourceDocument {
-                resourceTranslations {
-                  id
-                  language
-                }
+                id
+                link
                 fileFormat
               }
               toolkitCategories {
@@ -70,6 +69,7 @@ class ResourcesQuery {
           resourceDocument {
             id
             fileFormat
+            link
           }
           toolkitCategories {
             id
@@ -102,19 +102,11 @@ class ResourcesQuery {
           tags
           title
           updatedAt
+          language
           resourceDocument {
             id
             link
             title
-            resourceTranslations {
-              createdAt
-              id
-              language
-              link
-              publishedAt
-              stage
-              updatedAt
-            }
             fileFormat
           }
           resourceCategory
@@ -149,19 +141,11 @@ class ResourcesQuery {
           tags
           title
           updatedAt
+          language
           resourceDocument {
             id
             link
             title
-            resourceTranslations {
-              createdAt
-              id
-              language
-              link
-              publishedAt
-              stage
-              updatedAt
-            }
             fileFormat
           }
           resourceCategory

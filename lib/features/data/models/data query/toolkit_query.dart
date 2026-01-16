@@ -64,11 +64,10 @@ class ToolkitQuery {
                         createdAt
                         author
                         descriptionDeprecated
+                        language
                         resourceDocument {
-                            resourceTranslations {
-                                id
-                                language
-                            }
+                            id
+                            link
                             fileFormat
                         }
                     }

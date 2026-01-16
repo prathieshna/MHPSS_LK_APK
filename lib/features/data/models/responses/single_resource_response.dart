@@ -34,6 +34,7 @@ class SingleResourceDetails {
   final List<dynamic>? tags;
   final String? title;
   final DateTime? updatedAt;
+  final String? language; // Resource-level language field
   final List<SingleResourceDocument>? resourceDocument;
   final List<dynamic>? resourceCategory;
   final ImageDetails? image;
@@ -53,6 +54,7 @@ class SingleResourceDetails {
     this.tags,
     this.title,
     this.updatedAt,
+    this.language,
     this.resourceDocument,
     this.resourceCategory,
     this.image,
@@ -75,6 +77,7 @@ class SingleResourceDetails {
       title: json['title'],
       updatedAt:
           json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+      language: json['language'], // Parse resource-level language
       resourceDocument: (json['resourceDocument'] as List<dynamic>?)
           ?.map((item) => SingleResourceDocument.fromJson(item))
           .toList(),
@@ -103,6 +106,7 @@ class SingleResourceDetails {
       'tags': tags,
       'title': title,
       'updatedAt': updatedAt?.toIso8601String(),
+      'language': language,
       'resourceDocument': resourceDocument?.map((doc) => doc.toJson()).toList(),
       'resourceCategory': resourceCategory,
       'image': image?.toJson(),
@@ -137,14 +141,14 @@ class SingleResourceDocument {
   final String? id;
   final String? link;
   final String? title;
-  final List<ResourceTranslation>? resourceTranslations;
+  final String? language;
   final String? fileFormat;
 
   SingleResourceDocument({
     this.id,
     this.link,
     this.title,
-    this.resourceTranslations,
+    this.language,
     this.fileFormat,
   });
 
@@ -153,9 +157,7 @@ class SingleResourceDocument {
       id: json['id'],
       link: json['link'],
       title: json['title'],
-      resourceTranslations: (json['resourceTranslations'] as List<dynamic>?)
-          ?.map((item) => ResourceTranslation.fromJson(item))
-          .toList(),
+      language: json['language'],
       fileFormat: json['fileFormat'],
     );
   }
@@ -165,8 +167,7 @@ class SingleResourceDocument {
       'id': id,
       'link': link,
       'title': title,
-      'resourceTranslations':
-          resourceTranslations?.map((trans) => trans.toJson()).toList(),
+      'language': language,
       'fileFormat': fileFormat,
     };
   }

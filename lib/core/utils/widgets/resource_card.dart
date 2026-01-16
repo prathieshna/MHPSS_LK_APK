@@ -241,7 +241,7 @@ class ResourceCard extends StatelessWidget {
                 ],
               ),
 
-              if (isDownloadedScreen)
+              if (languages.isNotEmpty)
                 Column(
                   children: [
                     SizedBox(height: 10.h),
@@ -250,7 +250,7 @@ class ResourceCard extends StatelessWidget {
                       children: languages
                           .map((lang) => GestureDetector(
                                 onTap: () {
-                                  if (onLanguageTap != null) {
+                                  if (onLanguageTap != null && isDownloadedScreen) {
                                     onLanguageTap!(
                                         lang['link']!, lang['filePath']!);
                                   }

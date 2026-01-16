@@ -229,16 +229,8 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
     final fileName = resourceDocument.title ?? 'unknown.pdf';
     final pdfLanguage = widget.language;
     // try {
-    // Find the download link matching the selected language
-    final translation = (resourceDocument.resourceTranslations != null &&
-            resourceDocument.resourceTranslations!.isNotEmpty)
-        ? resourceDocument.resourceTranslations!.firstWhere(
-            (element) => element.language == lang,
-            orElse: () => resourceDocument.resourceTranslations!.first,
-          )
-        : null;
-
-    final downloadLink = translation?.link ?? widget.pdfLink;
+    // Since ResourceDocument now has language directly, just use the link from the document
+    final downloadLink = resourceDocument.link ?? widget.pdfLink;
     if (downloadLink.isEmpty) {
       Utils.displayToast('no_document_for_language'.tr());
       return;
@@ -250,9 +242,9 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
     ref.read(downloadToolTipProvider.notifier).state = false;
 
     final downloadLanguageTrans = DownloadLanguageTranslation(
-      id: translation?.id ?? "${DateTime.now().millisecondsSinceEpoch}",
+      id: resourceDocument.id ?? "${DateTime.now().millisecondsSinceEpoch}",
       language: pdfLanguage ?? "",
-      link: translation?.link ?? downloadLink,
+      link: downloadLink,
     );
     print("downloadLanguageTrans: ${downloadLanguageTrans.toJson()}");
     await ref.read(downloadProvider.notifier).download(

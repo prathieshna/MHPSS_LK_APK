@@ -66,7 +66,15 @@ class _AllResourcesScreenState extends ConsumerState<AllResourcesScreen> {
                                           doc.fileFormat?.toLowerCase() ==
                                           'video') ??
                                   false;
+
+                              // Extract language information from resource level
+                              final resourceLanguage = resourceData.language ?? '';
+                              final languages = resourceLanguage.isNotEmpty
+                                  ? [{'language': resourceLanguage, 'link': '', 'filePath': ''}]
+                                  : <Map<String, String>>[];
+
                               return ResourceCard(
+                                  languages: languages,
                                   title: resourceData.title ?? '',
                                   description:
                                       resourceData.descriptionDeprecated ?? '',
@@ -82,18 +90,10 @@ class _AllResourcesScreenState extends ConsumerState<AllResourcesScreen> {
                                   hasVideo: false,
                                   isFavourite: isFavorite,
                                   favouriteTap: () {
-                                    // Get PDF languages
-                                    List<String> pdfLanguages = resourceData
-                                        .resourceDocument
-                                        .where((doc) => doc.fileFormat == 'PDF')
-                                        .expand((doc) => doc
-                                            .resourceTranslations
-                                            .map((translation) =>
-                                                translation.language ??
-                                                'Unknown')
-                                            .where((language) =>
-                                                language.isNotEmpty))
-                                        .toList();
+                                    // Use resource-level language
+                                    List<String> pdfLanguages = resourceData.language != null
+                                        ? [resourceData.language!]
+                                        : <String>[];
 
                                     // Get all file formats
                                     List<String> fileFormats = resourceData
@@ -208,7 +208,14 @@ class _AllResourcesScreenState extends ConsumerState<AllResourcesScreen> {
                                           'video') ??
                                   false;
 
+                              // Extract language information from resource level
+                              final resourceLanguage = resourceData.language ?? '';
+                              final languages = resourceLanguage.isNotEmpty
+                                  ? [{'language': resourceLanguage, 'link': '', 'filePath': ''}]
+                                  : <Map<String, String>>[];
+
                               return ResourceCard(
+                                  languages: languages,
                                   title: resourceData.title ?? "",
                                   description:
                                       resourceData.descriptionDeprecated ?? "",
@@ -223,14 +230,10 @@ class _AllResourcesScreenState extends ConsumerState<AllResourcesScreen> {
                                       .year
                                       .toString(),
                                   favouriteTap: () {
-                                    List<String> pdfLanguages = resourceData
-                                        .resourceDocument!
-                                        .where((doc) => doc.fileFormat == 'PDF')
-                                        .expand((doc) =>
-                                            (doc.resourceTranslations)!.map(
-                                                (translation) =>
-                                                    translation.language!))
-                                        .toList();
+                                    // Use resource-level language
+                                    List<String> pdfLanguages = resourceData.language != null
+                                        ? [resourceData.language!]
+                                        : <String>[];
 
                                     List<String>? fileFormats = resourceData
                                         .resourceDocument!

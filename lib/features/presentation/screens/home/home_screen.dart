@@ -175,6 +175,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       doc.fileFormat?.toLowerCase() ==
                                       'video') ??
                               false;
+
                           return ResourceCard(
                               title: resourceData.title ?? "",
                               description:
@@ -190,13 +191,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       .year
                                       .toString(),
                               favouriteTap: () {
-                                List<String> pdfLanguages = resourceData
-                                    .resourceDocument!
-                                    .where((doc) => doc.fileFormat == 'PDF')
-                                    .expand((doc) => (doc.resourceTranslations)!
-                                        .map((translation) =>
-                                            translation.language!))
-                                    .toList();
+                                // Use resource-level language
+                                List<String> pdfLanguages = resourceData.language != null
+                                    ? [resourceData.language!]
+                                    : <String>[];
 
                                 List<String>? fileFormats = resourceData
                                     .resourceDocument!

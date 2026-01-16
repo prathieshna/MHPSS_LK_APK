@@ -62,6 +62,7 @@ class PopularResource {
   String? createdAt;
   String? author;
   String? descriptionDeprecated;
+  String? language; // Resource-level language field
   List<PopularResourceDocument>? resourceDocument;
   List<ToolkitCategory>? toolkitCategories;
   bool? popular;
@@ -76,6 +77,7 @@ class PopularResource {
     this.createdAt,
     this.author,
     this.descriptionDeprecated,
+    this.language,
     this.resourceDocument,
     this.toolkitCategories,
     this.popular,
@@ -100,6 +102,7 @@ class PopularResource {
       createdAt: json['createdAt'],
       author: json['author'],
       descriptionDeprecated: json['descriptionDeprecated'],
+      language: json['language'],
       resourceDocument: resourceDocuments,
       toolkitCategories: categories,
       popular: json['popular'],
@@ -120,34 +123,24 @@ class ImageUrl {
 }
 
 class PopularResourceDocument {
-  List<PopularResourceTranslation>? resourceTranslations;
-  String? fileFormat;
-
-  PopularResourceDocument({this.resourceTranslations, this.fileFormat});
-
-  factory PopularResourceDocument.fromJson(Map<String, dynamic> json) {
-    var translationList = json['resourceTranslations'] as List?;
-    List<PopularResourceTranslation>? translations = translationList
-        ?.map((i) => PopularResourceTranslation.fromJson(i))
-        .toList();
-
-    return PopularResourceDocument(
-      resourceTranslations: translations,
-      fileFormat: json['fileFormat'],
-    );
-  }
-}
-
-class PopularResourceTranslation {
   String? id;
   String? language;
+  String? link;
+  String? fileFormat;
 
-  PopularResourceTranslation({this.id, this.language});
+  PopularResourceDocument({
+    this.id,
+    this.language,
+    this.link,
+    this.fileFormat,
+  });
 
-  factory PopularResourceTranslation.fromJson(Map<String, dynamic> json) {
-    return PopularResourceTranslation(
+  factory PopularResourceDocument.fromJson(Map<String, dynamic> json) {
+    return PopularResourceDocument(
       id: json['id'],
       language: json['language'],
+      link: json['link'],
+      fileFormat: json['fileFormat'],
     );
   }
 }

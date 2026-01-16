@@ -219,10 +219,7 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                                 .resource!.resourceDocument!
                                                 .where((doc) =>
                                                     doc.fileFormat == 'PDF')
-                                                .expand((doc) =>
-                                                    (doc.resourceTranslations)!)
-                                                .map((translation) =>
-                                                    translation.language!));
+                                                .map((doc) => doc.language ?? ""));
 
                                         List<String>? fileFormats = singleResourceData
                                             .resource!.resourceDocument!
@@ -341,17 +338,18 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                       singleResourceData.resource!.slug!))
                                   .when(
                                     data: (resourcesBySlug) {
-                                      // Collect ALL translations from ALL resources with this slug
-                                      // Include PDF and all other downloadable formats (XLSX, DOCX, etc.)
-                                      final allPdfTranslations = <ResourceTranslation>[];
+                                      // Collect ALL documents from ALL resources with this slug
+                                      // Associate each document with its parent resource's language
+                                      final allLanguageDocuments = <Map<String, dynamic>>[];
 
                                       for (var resource in resourcesBySlug.resources) {
                                         if (resource.resourceDocument != null) {
                                           for (var doc in resource.resourceDocument!) {
-                                            // Include all file formats (PDF, XLSX, DOCX, PPT, etc.)
-                                            if (doc.resourceTranslations != null) {
-                                              allPdfTranslations.addAll(doc.resourceTranslations!);
-                                            }
+                                            allLanguageDocuments.add({
+                                              'document': doc,
+                                              'language': resource.language ?? '',
+                                              'link': doc.link ?? '',
+                                            });
                                           }
                                         }
                                       }
@@ -366,9 +364,9 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                     preview: Wrap(
                                       spacing: 6,
                                       runSpacing: -8,
-                                      children: allPdfTranslations.map((translation) {
+                                      children: allLanguageDocuments.map((item) {
                                         return Chip(
-                                          label: Text(LanguageUtils.getLanguageName(translation.language ?? "")),
+                                          label: Text(LanguageUtils.getLanguageName(item['language'] ?? "")),
                                           padding: EdgeInsets.all(0),
                                           labelStyle: TextStyle(
                                               fontSize: 11.6.sp,
@@ -391,9 +389,9 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                         Wrap(
                                           spacing: 6,
                                           runSpacing: -8,
-                                          children: allPdfTranslations.map((translation) {
+                                          children: allLanguageDocuments.map((item) {
                                             return ActionChip(
-                                              label: Text(LanguageUtils.getLanguageName(translation.language ?? "")),
+                                              label: Text(LanguageUtils.getLanguageName(item['language'] ?? "")),
                                               padding: EdgeInsets.all(0),
                                               labelStyle: TextStyle(
                                                   fontSize: 11.6.sp,
@@ -401,8 +399,8 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                                   color: Colors.blue),
                                               onPressed: () async {
                                                 // Directly open the PDF/link for this language
-                                                final link = translation.link;
-                                                final language = translation.language ?? "";
+                                                final link = item['link'] ?? "";
+                                                final language = item['language'] ?? "";
 
                                                 if (link != null && link.isNotEmpty) {
                                                   if (_shouldOpenInPdfReader(link)) {
@@ -425,12 +423,12 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                         )
                                       ],
                                     ),
-                                    onTap: allPdfTranslations.isNotEmpty
+                                    onTap: allLanguageDocuments.isNotEmpty
                                         ? () {
                                             // Keep the picker as alternative way to select
-                                            _showPicker(
+                                            _showLanguagePicker(
                                               context,
-                                              allPdfTranslations,
+                                              allLanguageDocuments,
                                               'select_language'.tr(),
                                               singleResourceData.resource!,
                                             );
@@ -475,12 +473,16 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                     ),
                                     error: (error, stack) {
                                       // Fallback to original behavior if slug query fails
-                                      final allPdfTranslations = <ResourceTranslation>[];
-                                      for (var pdfDoc in documentGroups.pdfDocuments) {
-                                        if (pdfDoc.resourceTranslations != null) {
-                                          allPdfTranslations.addAll(pdfDoc.resourceTranslations!);
-                                        }
-                                      }
+                                      // Use resource-level language for the current resource
+                                      final resourceLanguage = singleResourceData.resource!.language ?? '';
+                                      final allDocuments = documentGroups.pdfDocuments;
+
+                                      // Create language document list with resource-level language
+                                      final fallbackLanguageDocuments = allDocuments.map((doc) => {
+                                        'document': doc,
+                                        'language': resourceLanguage,
+                                        'link': doc.link ?? '',
+                                      }).toList();
 
                                       return _buildExpandableResourceSection(
                                         ref,
@@ -491,9 +493,9 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                         preview: Wrap(
                                           spacing: 6,
                                           runSpacing: -8,
-                                          children: allPdfTranslations.map((translation) {
+                                          children: fallbackLanguageDocuments.map((item) {
                                             return Chip(
-                                              label: Text(LanguageUtils.getLanguageName(translation.language ?? "")),
+                                              label: Text(LanguageUtils.getLanguageName(item['language'] as String? ?? "")),
                                               padding: EdgeInsets.all(0),
                                               labelStyle: TextStyle(
                                                   fontSize: 11.6.sp,
@@ -515,19 +517,19 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                             Wrap(
                                               spacing: 6,
                                               runSpacing: -8,
-                                              children: allPdfTranslations.map((translation) {
+                                              children: fallbackLanguageDocuments.map((item) {
                                                 return ActionChip(
-                                                  label: Text(LanguageUtils.getLanguageName(translation.language ?? "")),
+                                                  label: Text(LanguageUtils.getLanguageName(item['language'] as String? ?? "")),
                                                   padding: EdgeInsets.all(0),
                                                   labelStyle: TextStyle(
                                                       fontSize: 11.6.sp,
                                                       fontWeight: FontWeight.w400,
                                                       color: Colors.blue),
                                                   onPressed: () async {
-                                                    final link = translation.link;
-                                                    final language = translation.language ?? "";
+                                                    final link = item['link'] as String? ?? "";
+                                                    final language = item['language'] as String? ?? "";
 
-                                                    if (link != null && link.isNotEmpty) {
+                                                    if (link.isNotEmpty) {
                                                       if (_shouldOpenInPdfReader(link)) {
                                                         navigator.navigateTo(
                                                           PdfReaderScreen(
@@ -548,11 +550,11 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                             )
                                           ],
                                         ),
-                                        onTap: allPdfTranslations.isNotEmpty
+                                        onTap: fallbackLanguageDocuments.isNotEmpty
                                             ? () {
-                                                _showPicker(
+                                                _showLanguagePicker(
                                                   context,
-                                                  allPdfTranslations,
+                                                  fallbackLanguageDocuments,
                                                   'select_language'.tr(),
                                                   singleResourceData.resource!,
                                                 );
@@ -622,6 +624,37 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                   } catch (e) {
                                     print(
                                         'An error occurred while retrieving the video link: ${e.toString()}');
+                                  }
+                                },
+                              ),
+
+                            // Other Documents Section (XLSX, DOCX, etc.)
+                            if (documentGroups.otherDocument != null)
+                              _buildExpandableResourceSection(
+                                ref,
+                                'other_documents',
+                                documentGroups.otherDocument?.title ??
+                                    (documentGroups.otherDocument?.fileFormat?.toUpperCase() ?? "Document"),
+                                AppImages.docIcon,
+                                onTap: () async {
+                                  try {
+                                    if (documentGroups.otherDocument != null) {
+                                      final String docLink =
+                                          documentGroups.otherDocument!.link ?? '';
+
+                                      if (docLink.isNotEmpty) {
+                                        await appFunctions.openWebUrl(docLink);
+                                      } else {
+                                        Utils.displayToast(
+                                            'no_document_available'.tr());
+                                      }
+                                    } else {
+                                      Utils.displayToast(
+                                          'no_document_available'.tr());
+                                    }
+                                  } catch (e) {
+                                    print(
+                                        'An error occurred while retrieving the document link: ${e.toString()}');
                                   }
                                 },
                               ),
@@ -734,23 +767,10 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
                                                 .year
                                                 .toString(),
                                             favouriteTap: () {
-                                              // Get PDF languages
-                                              List<String> pdfLanguages =
-                                                  resourceData.resourceDocument
-                                                      .where(
-                                                          (doc) =>
-                                                              doc.fileFormat ==
-                                                              'PDF')
-                                                      .expand((doc) => doc
-                                                          .resourceTranslations
-                                                          .map((translation) =>
-                                                              translation
-                                                                  .language ??
-                                                              'Unknown')
-                                                          .where((language) =>
-                                                              language
-                                                                  .isNotEmpty))
-                                                      .toList();
+                                              // Use resource-level language
+                                              List<String> pdfLanguages = resourceData.language != null
+                                                  ? [resourceData.language!]
+                                                  : <String>[];
 
                                               // Get all file formats
                                               List<String> fileFormats =
@@ -851,7 +871,7 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
 
   void _showPicker(
     BuildContext context,
-    List<ResourceTranslation> items,
+    List<SingleResourceDocument> items,
     String title,
     SingleResourceDetails resourceDetails,
   ) {
@@ -868,7 +888,7 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
       ),
-      builder: (context) => PickerWidget<ResourceTranslation>(
+      builder: (context) => PickerWidget<SingleResourceDocument>(
         title: title,
         items: items,
         itemToString: (item) => LanguageUtils.getLanguageName(item.language ?? ""),
@@ -882,6 +902,51 @@ class _ResourceDetailsScreenState extends ConsumerState<ResourceDetailsScreen> {
           navigator.pop(context);
           await Future.delayed(Duration(milliseconds: 100));
           print("selectedLanguage: $selectedLink");
+
+          if (selectedLink != null && _shouldOpenInPdfReader(selectedLink!)) {
+            navigator.navigateTo(PdfReaderScreen(
+              pdfLink: selectedLink ?? "",
+              language: selectedLanguage ?? "",
+              resourceDetails: resourceDetails,
+            ));
+          } else {
+            appFunctions.openWebUrl(selectedLink ?? "");
+          }
+        },
+      ),
+    );
+  }
+
+  void _showLanguagePicker(
+    BuildContext context,
+    List<Map<String, dynamic>> items,
+    String title,
+    SingleResourceDetails resourceDetails,
+  ) {
+    // Set the first item as default if available
+    if (items.isNotEmpty) {
+      selectedLink = items.first['link'];
+      selectedLanguage = items.first['language'];
+    }
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+      ),
+      builder: (context) => PickerWidget<Map<String, dynamic>>(
+        title: title,
+        items: items,
+        itemToString: (item) => LanguageUtils.getLanguageName(item['language'] ?? ""),
+        onItemSelected: (selectedItem) {
+          setState(() {
+            selectedLink = selectedItem['link'];
+            selectedLanguage = selectedItem['language'];
+          });
+        },
+        onConfirm: () async {
+          navigator.pop(context);
+          await Future.delayed(Duration(milliseconds: 100));
 
           if (selectedLink != null && _shouldOpenInPdfReader(selectedLink!)) {
             navigator.navigateTo(PdfReaderScreen(
