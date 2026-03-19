@@ -8,7 +8,8 @@
       "Bash(pod install:*)",
       "Bash(firebase --version:*)",
       "Bash(find:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(dart run:*)"
     ],
     "deny": [],
     "ask": []
